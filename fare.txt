@@ -1,0 +1,11 @@
+So I propose this for fare calculation:
+
+
+
+ESTIMATED FARE CALCULATION MODULE: 
+Screen 4 wil call estimateFareCalculate Module before the journey starts. Google distance matrix API will return the optimum distance and time as JSON objects. The Estimated fare will be calculated as : (base fare + time amount + distance amount) where Time rate and distance rate will be defined by us and will be multiplied by the time and distance values provided by Google maps API.
+
+
+
+
+ACTUAL FARE CALCULATION MODULE: Actual Fare will be shown on the end screen, i.e, Screen 7, after the journey ends. We will be making continuous GPS calls to monitor the actual distance travelled and the journey time will also be recorded. So actual fare will be calculated as:  (base fare + time amount + distance amount) where Time rate and distance rate will be defined by us(similar to that in estimated fare module)  and will be multiplied by the time and distance values recorded by GPS monitoring.
