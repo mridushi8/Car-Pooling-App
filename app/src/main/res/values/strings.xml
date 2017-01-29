@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">login</string>
+    <string name="popup">Successfully Submitted</string>
+    <string name="fail">Failed to Submit</string>
+    <string name="serverAddress">http://192.168.0.7:8000</string>
+</resources>
