@@ -1,5 +1,0 @@
-<resources>
-    <string name="app_name">login</string>
-    <string name="popup">Successfully Submitted</string>
-    <string name="fail">Failed to Submit</string>
-</resources>
