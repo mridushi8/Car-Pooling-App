@@ -92,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
                 Pass = pass.getText().toString();
 
                 RequestQueue MyRequestQueue = Volley.newRequestQueue(getBaseContext());
-                String url= "http://192.168.1.3:8000/checkmatch/";
+                String url= "http://192.168.1.9:8000/checkmatch/";
                 StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>(){
                     @Override
                     public void onResponse(String response) {
