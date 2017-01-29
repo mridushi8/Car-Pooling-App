@@ -72,7 +72,7 @@ public class afterlogin extends AppCompatActivity {
                      if (selectedrb.getText().equals("Driver"))
                      {    Log.d("my", "driver selected");
                          RequestQueue MyRequestQueue = Volley.newRequestQueue(getBaseContext());
-                         String url= "http://10.0.2.2:8000/checkproof/";
+                         String url= "http://192.168.1.9:8000/checkproof/";
                          StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>(){
                              @Override
                              public void onResponse(String response) {
