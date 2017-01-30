@@ -108,6 +108,8 @@
                 android:hint="Password"
                 android:background="#f3f3f3"
                 android:paddingLeft="5dp"
+                android:inputType="textPassword"
+
                 android:layout_marginTop="30dp"/>
 
 
@@ -118,6 +120,7 @@
                 android:hint="Retype Password"
                 android:background="#f3f3f3"
                 android:paddingLeft="5dp"
+                android:inputType="textPassword"
                 android:layout_marginTop="15dp"/>
 
 

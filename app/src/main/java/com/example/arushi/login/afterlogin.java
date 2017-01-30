@@ -68,6 +68,11 @@ public class afterlogin extends AppCompatActivity {
                 selectedrb = (RadioButton) findViewById(selectedId);
                 Log.d("my","selected rb");
                 System.out.println(selectedrb.getText());
+                if (selectedrb.getText().equals("Passenger"))
+                {
+                    Intent i = new Intent(afterlogin.this, MapsActivity.class);
+                    startActivity(i);
+                }
 
                      if (selectedrb.getText().equals("Driver"))
                      {    Log.d("my", "driver selected");
@@ -81,8 +86,7 @@ public class afterlogin extends AppCompatActivity {
 
                                  if (response.equals("\"1\"")) { 
 					 
-					Intent i = new Intent(afterlogin.this, MapsActivity.class);
-                            		startActivity(i); 
+
 					 
                                  }
                                  else if (response.equals("\"0\""))

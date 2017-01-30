@@ -63,24 +63,34 @@
                 android:layout_marginTop="15dp"
                 android:layout_gravity="center_horizontal"/>
 
+            <RadioGroup
+                android:id="@+id/RBG"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" >
 
-            <RadioButton
-                android:text="Driver"
-                android:id="@+id/driver"
-                android:layout_width="fill_parent"
-                android:layout_height="40dp"
-                android:background="#f3f3f3"
-                android:paddingLeft="5dp"
-                android:layout_marginTop="30dp"/>
-            <RadioButton
-                android:text="Passenger"
-                android:id="@+id/passenger"
-                android:layout_width="fill_parent"
-                android:layout_height="40dp"
-                android:background="#f3f3f3"
-                android:paddingLeft="5dp"
-                android:layout_marginTop="30dp"/>
+                <RadioButton
+                    android:text="Driver"
+                    android:id="@+id/driver"
+                    android:layout_width="fill_parent"
+                    android:layout_height="40dp"
+                    android:background="#f3f3f3"
+                    android:paddingLeft="5dp"
+                    android:buttonTint="@color/your_color"
 
+                    android:layout_marginTop="30dp"/>
+
+                <RadioButton
+                    android:text="Passenger"
+                    android:id="@+id/passenger"
+                    android:layout_width="fill_parent"
+                    android:layout_height="40dp"
+                    android:background="#f3f3f3"
+                    android:checked="true"
+                    android:paddingLeft="5dp"
+                    android:layout_marginTop="30dp"
+                    android:buttonTint="@color/your_color"/>
+
+            </RadioGroup>
 
             <ImageView android:layout_width="100dp"
                 android:layout_height="20dp"

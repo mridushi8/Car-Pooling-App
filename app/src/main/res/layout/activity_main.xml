@@ -80,7 +80,8 @@
                 android:hint="password"
                 android:background="#f3f3f3"
                 android:paddingLeft="5dp"
-                android:layout_marginTop="15dp"/>
+                android:inputType="textPassword"
+                android:layout_marginTop="15dp" />
 
 
             <LinearLayout
