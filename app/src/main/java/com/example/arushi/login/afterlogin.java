@@ -84,8 +84,9 @@ public class afterlogin extends AppCompatActivity {
                                  Context context = getApplicationContext();
                                  Log.d("my", response);
 
-                                 if (response.equals("\"1\"")) { 
-					 
+                                 if (response.equals("\"1\"")) {
+                                     Intent i = new Intent(afterlogin.this, MapActivity_driv.class);
+                                     startActivity(i);
 
 					 
                                  }

@@ -6,7 +6,7 @@
     android:paddingLeft="16dp"
     android:paddingRight="16dp"
     android:orientation="vertical"
-    tools:context="com.carpool.maptask.MapsActivity">
+  >
 	<LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
