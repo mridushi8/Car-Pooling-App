@@ -2,12 +2,15 @@ package com.example.arushi.login;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.net.Uri;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -40,7 +43,10 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import static android.widget.Toast.LENGTH_LONG;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
@@ -54,6 +60,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     double sourcelog;
     double destlat;
     double destlog;
+    String origin;
+    String dest;
+	public static final String Userid = "idKey";
+	public static final String MyPREFERENCES = "MyPref" ;
+	SharedPreferences sharedpreferences;
+	String value;
+	
  
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +87,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onPlaceSelected(Place place) {
                 Log.i(TAG, "Place: " + place.getName());
                 String location = (String) place.getAddress();
+
                 Geocoder geocoder = new Geocoder(getBaseContext());
                 try {
                     List addressList = geocoder.getFromLocationName(location, 1);
@@ -88,6 +102,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+                origin = (String) place.getName();
 
             }
  
@@ -105,6 +120,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onPlaceSelected(Place place) {
                 Log.i(TAG, "Place: " + place.getName());
                 String location = (String) place.getAddress();
+
                 Geocoder geocoder = new Geocoder(getBaseContext());
                 try {
                     List addressList = geocoder.getFromLocationName(location, 1);
@@ -120,15 +136,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+                dest = (String) place.getName();
             }
  
             @Override
             public void onError(Status status) {
                 Log.i(TAG, "An error occurred: " + status);
             }
- 
- 
+		 
         });
+		sharedpreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);	
+	    value = sharedpreferences.getString(Userid, "");
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 
@@ -250,27 +268,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
  
     public void onClick(View view) {
-        String origin = autocompleteFragment.toString();
-        String dest = autocompleteFragment1.toString();
-        RequestQueue MyRequestQueue = Volley.newRequestQueue(getBaseContext());
-        String url = "http://192.168.1.4:8000/api/estimatefare/?origin=" + origin + "&dest=" + dest;
-        StringRequest MyStringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                Context context = getApplicationContext();
-                Toast.makeText(context, R.string.popup, LENGTH_LONG)
-                        .show();
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Context context = getApplicationContext();
-                Toast.makeText(context, R.string.fail, LENGTH_LONG)
-                        .show();
-                error.printStackTrace();
-            }
-        });
-        MyRequestQueue.add(MyStringRequest);
+		sendDetails();
  
     }
 
@@ -297,4 +295,37 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         AppIndex.AppIndexApi.end(client, getIndexApiAction());
         client.disconnect();
     }
+    
+	
+	public void sendDetails(){
+		RequestQueue MyRequestQueue = Volley.newRequestQueue(getBaseContext());
+        String url = "http://192.168.1.5:8000/api/request";
+        StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Intent i = new Intent(MapsActivity.this, Details.class);
+                startActivity(i);              
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Context context = getApplicationContext();
+                Toast.makeText(context, R.string.fail, LENGTH_LONG)
+                        .show();
+                error.printStackTrace();
+            }
+        }){
+		@Override
+            protected Map<String,String> getParams(){
+                Map<String,String> params = new HashMap<String, String>();
+                params.put("id",value);
+                params.put("ts","1");
+                params.put("src", origin);
+				params.put("dest", dest);
+                return params;
+            }
+		};
+        MyRequestQueue.add(MyStringRequest);
+	}
+	
 }
