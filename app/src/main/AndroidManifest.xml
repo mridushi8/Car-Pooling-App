@@ -29,6 +29,14 @@
         <activity
             android:name=".MapsActivity"
             android:label="@string/title_activity_maps"></activity>
+        <activity
+            android:name=".Details"
+            android:label="@string/title_activity_maps">
+        </activity>
+        <activity
+            android:name=".Trip"
+            android:label="@string/title_activity_maps">
+        </activity>
 
         <meta-data
             android:name="com.google.android.gms.version"
