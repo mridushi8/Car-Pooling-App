@@ -69,64 +69,28 @@ public class afterlogin extends AppCompatActivity {
                 Log.d("my","selected rb");
                 System.out.println(selectedrb.getText());
                 if (selectedrb.getText().equals("Passenger"))
+                { if(sharedpreferences.contains( "iden")|| sharedpreferences.contains("driv"))
                 {
                     Intent i = new Intent(afterlogin.this, MapsActivity.class);
+                    startActivity(i); }
+
+                else {
+                    Intent i = new Intent(afterlogin.this, upload_pass.class);
                     startActivity(i);
                 }
+                }
 
-                     if (selectedrb.getText().equals("Driver"))
-                     {    Log.d("my", "driver selected");
-                         RequestQueue MyRequestQueue = Volley.newRequestQueue(getBaseContext());
-                         String url= "http://192.168.1.9:8000/checkproof/";
-                         StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>(){
-                             @Override
-                             public void onResponse(String response) {
-                                 Context context = getApplicationContext();
-                                 Log.d("my", response);
+                if (selectedrb.getText().equals("Driver"))
+                {  if(sharedpreferences.contains("driv"))
+                {
+                    Intent i = new Intent(afterlogin.this, MapActivity_driv.class);
+                    startActivity(i); }
 
-                                 if (response.equals("\"1\"")) {
-                                     Intent i = new Intent(afterlogin.this, MapActivity_driv.class);
-                                     startActivity(i);
-
-					 
-                                 }
-                                 else if (response.equals("\"0\""))
-                                 {
-                                     //documents for driving are not complete.
-                                     //show pop up and redirect to register form initially
-                                     AlertDialog alertDialog = new AlertDialog.Builder(
-                                             afterlogin.this).create();
-                                     alertDialog.setTitle("Incomplete Details");
-                                     alertDialog.setMessage("Providing a Driving License and Car number is compulsory for a driver");
-                                     alertDialog.setButton("Update Details", new DialogInterface.OnClickListener() {
-                                         public void onClick(DialogInterface dialog, int which) {
-                                             //redirect to profile
-                                         }
-                                     });
-                                     alertDialog.show();
-
-                                 }
-                             } }, new Response.ErrorListener() {
-                             @Override
-                             public void onErrorResponse(VolleyError error) {
-                                 Context context = getApplicationContext();
-                                 Toast.makeText(context, R.string.fail, LENGTH_LONG)
-                                         .show();
-                                 error.printStackTrace();
-                             }
-                         }){
-                             protected Map<String, String> getParams(){
-                                 Map<String, String> MyData = new HashMap<String, String>();
-                                 MyData.put("id", id);
-                                 //id will come from shared preferences
-
-                                 return MyData;
-                             };
-                         };
-                         MyRequestQueue.add(MyStringRequest);
-
-
-                     }
+                else {
+                    Intent i = new Intent(afterlogin.this, upload_driv.class);
+                    startActivity(i);
+                }
+                }
 
 
 

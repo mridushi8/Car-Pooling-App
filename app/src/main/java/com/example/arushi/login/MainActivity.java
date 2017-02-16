@@ -1,5 +1,7 @@
 package com.example.arushi.login;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -21,13 +23,14 @@ import com.android.volley.toolbox.Volley;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import static android.widget.Toast.LENGTH_LONG;
 
 
 public class MainActivity extends AppCompatActivity {
     EditText email, pass;
-    String emailid, Pass;
+    String emailid, Pass, newpass;
     public static final String MyPREFERENCES = "MyPref" ;
     public static final String Name = "nameKey";
     public static final String Userid = "idKey";
@@ -51,12 +54,86 @@ public class MainActivity extends AppCompatActivity {
         email=(EditText)findViewById(R.id.username);
         pass=(EditText)findViewById(R.id.pw);
 
+        final TextView forgotpw =(TextView)findViewById(R.id.forgot_password);
+        forgotpw.setOnClickListener(new Button.OnClickListener(){
+                                        public void onClick(View v) {
+
+                                            if (email.getText().toString().equals(""))
+                                            {
+                                                final AlertDialog alertDialog = new AlertDialog.Builder(
+                                                        MainActivity.this).create();
+                                                alertDialog.setTitle("Forgot Password");
+                                                alertDialog.setMessage("Enter your email address.");
+                                                alertDialog.setButton("BACK", new DialogInterface.OnClickListener() {
+                                                    public void onClick(DialogInterface dialog, int which) {
+                                                        alertDialog.dismiss();
+                                                    }
+                                                });
+                                                alertDialog.show();
+                                            }
+                                            else if(!email.getText().toString().contains("@")) {
+                                                Toast.makeText(getApplicationContext(), "Invalid Input!", Toast.LENGTH_LONG).show();
+                                            }
+
+                                            else if (!email.getText().toString().equals(""))
+                                            {
+                                                emailid = email.getText().toString();
+                                                newpass = UUID.randomUUID().toString().replaceAll("-", "").substring(0,10);
+                                                System.out.println(newpass);
+                                                RequestQueue MyRequestQueue = Volley.newRequestQueue(getBaseContext());
+                                                String url= "http://192.168.0.5:8000/forgetpass/";
+                                                StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>(){
+                                                    @Override
+                                                    public void onResponse(String response) {
+                                                        Context context = getApplicationContext();
+
+                                                        if(response.equals("\"nouser\""))
+                                                        {
+                                                            Toast.makeText(context, "The user is not registered!", LENGTH_LONG)
+                                                                    .show();
+                                                        }
+
+                                                        else {
+                                                            Toast.makeText(context, "Your new password has been sent to your registered email!", LENGTH_LONG)
+                                                                    .show(); }
+
+                                                    }
+                                                }, new Response.ErrorListener() {
+                                                    @Override
+                                                    public void onErrorResponse(VolleyError error) {
+                                                        Context context = getApplicationContext();
+                                                        Toast.makeText(context, R.string.fail, LENGTH_LONG)
+                                                                .show();
+                                                        error.printStackTrace();
+                                                    }
+                                                }){
+                                                    protected Map<String, String> getParams(){
+                                                        Map<String, String> MyData = new HashMap<String, String>();
+                                                        MyData.put("email", emailid);
+                                                        MyData.put("pass", newpass);
+                                                        return MyData;
+                                                    };
+
+                                                };
+
+                                                MyRequestQueue.add(MyStringRequest);
+                                            }
+
+
+                                        }
+
+
+
+
+                                    }
+        );
+
         //Register button
-            final TextView signup =(TextView)findViewById(R.id.reg);
+        final TextView signup =(TextView)findViewById(R.id.reg);
         signup.setOnClickListener(new Button.OnClickListener(){
             public void onClick(View v) {
                 Intent i = new Intent(MainActivity.this, Register.class);
-                                   startActivity(i);
+                startActivity(i);
 
             }
         });
@@ -88,76 +165,76 @@ public class MainActivity extends AppCompatActivity {
 
                 else {
 
-                emailid = email.getText().toString();
-                Pass = pass.getText().toString();
+                    emailid = email.getText().toString();
+                    Pass = pass.getText().toString();
 
-                RequestQueue MyRequestQueue = Volley.newRequestQueue(getBaseContext());
-                String url= "http://192.168.1.9:8000/checkmatch/";
-                StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>(){
-                    @Override
-                    public void onResponse(String response) {
-                        Context context = getApplicationContext();
-                        SharedPreferences.Editor editor = sharedpreferences.edit();
-
-
-                        if(response.equals("\"nomatch\""))
-                        {
-                           Toast.makeText(context, R.string.popup, LENGTH_LONG)
-                                   .show();
-                        }
-
-                       else if(response.equals("\"nouser\""))
-                        {
-                            Toast.makeText(context, "The user is not registered!", LENGTH_LONG)
-                                    .show();
-                        }
-                        else
-                        {  //retrieve the userid and name from server and save it in shared preferences
-
-                            String[] parts = response.split(",");
-                            String[] t = parts[0].split(":");
-                            String id=t[1];
-
-                            String[] t1 = parts[1].split(":");
-                            String name=t1[1];
-                            name = name.replace("}","");
-                            name = name.substring(1);
-                            name= name.substring(0,name.length() - 1);
+                    RequestQueue MyRequestQueue = Volley.newRequestQueue(getBaseContext());
+                    String url= "http://192.168.0.5:8000/checkmatch/";
+                    StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>(){
+                        @Override
+                        public void onResponse(String response) {
+                            Context context = getApplicationContext();
+                            SharedPreferences.Editor editor = sharedpreferences.edit();
 
 
-                            editor.putString(Userid, id);
-                            editor.putString(Name, name);
-                            editor.commit();
+                            if(response.equals("\"nomatch\""))
+                            {
+                                Toast.makeText(context, R.string.popup, LENGTH_LONG)
+                                        .show();
+                            }
 
-                            //for retrieving data from shared preferences
-                            String value = sharedpreferences.getString(Userid, "");
-                            System.out.println(value);
+                            else if(response.equals("\"nouser\""))
+                            {
+                                Toast.makeText(context, "The user is not registered!", LENGTH_LONG)
+                                        .show();
+                            }
+                            else
+                            {  //retrieve the userid and name from server and save it in shared preferences
 
-                            Intent i = new Intent(MainActivity.this, afterlogin.class);
-                            startActivity(i);
+                                String[] parts = response.split(",");
+                                String[] t = parts[0].split(":");
+                                String id=t[1];
+
+                                String[] t1 = parts[1].split(":");
+                                String name=t1[1];
+                                name = name.replace("}","");
+                                name = name.substring(1);
+                                name= name.substring(0,name.length() - 1);
 
 
-                        }
+                                editor.putString(Userid, id);
+                                editor.putString(Name, name);
+                                editor.commit();
+
+                                //for retrieving data from shared preferences
+                                String value = sharedpreferences.getString(Userid, "");
+                                System.out.println(value);
+
+                                Intent i = new Intent(MainActivity.this, afterlogin.class);
+                                startActivity(i);
+
+
+                            }
                         }
                     }, new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Context context = getApplicationContext();
-                       Toast.makeText(context, R.string.fail, LENGTH_LONG)
-                                .show();
-                        error.printStackTrace();
-                    }
-                }){
-                    protected Map<String, String> getParams(){
-                        Map<String, String> MyData = new HashMap<String, String>();
-                        MyData.put("email", emailid);
-                        MyData.put("pass", Pass);
-                        return MyData;
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            Context context = getApplicationContext();
+                            Toast.makeText(context, R.string.fail, LENGTH_LONG)
+                                    .show();
+                            error.printStackTrace();
+                        }
+                    }){
+                        protected Map<String, String> getParams(){
+                            Map<String, String> MyData = new HashMap<String, String>();
+                            MyData.put("email", emailid);
+                            MyData.put("pass", Pass);
+                            return MyData;
+                        };
+
                     };
 
-                };
-
-                MyRequestQueue.add(MyStringRequest);
+                    MyRequestQueue.add(MyStringRequest);
                 }
 
 
