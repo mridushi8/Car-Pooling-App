@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -32,6 +33,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
@@ -66,7 +68,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 	public static final String MyPREFERENCES = "MyPref" ;
 	SharedPreferences sharedpreferences;
 	String value;
-	
+	TextView estfare;
+    TextView estfare1;
  
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +78,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+        estfare = (TextView) findViewById (R.id.estfare);
+        estfare1 = (TextView) findViewById (R.id.estfare1);
  
         autocompleteFragment =
                 (PlaceAutocompleteFragment) getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
@@ -96,7 +101,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         sourcelat = address.getLatitude();
                         sourcelog = address.getLongitude();
                         LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
-                        mMap.addMarker(new MarkerOptions().position(latLng).draggable(true));
+                        mMap.addMarker(new MarkerOptions().position(latLng).draggable(true).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
                         mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
                     }
                 } catch (IOException e) {
@@ -129,8 +134,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         destlat = address.getLatitude();
                         destlog = address.getLongitude();
                         LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
-                        mMap.addMarker(new MarkerOptions().position(latLng).draggable(true));
+                        mMap.addMarker(new MarkerOptions().position(latLng).draggable(true).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
                         mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
+                        estfare();
                         getDirection();
                     }
                 } catch (IOException e) {
@@ -212,7 +218,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Polyline line = mMap.addPolyline(new PolylineOptions()
                     .addAll(list)
                     .width(10)
-                    .color(Color.RED)
+                    .color(Color.BLUE)
                     .geodesic(true)
             );
 
@@ -269,7 +275,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
  
     public void onClick(View view) {
 		sendDetails();
- 
     }
 
     public Action getIndexApiAction() {
@@ -299,12 +304,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 	
 	public void sendDetails(){
 		RequestQueue MyRequestQueue = Volley.newRequestQueue(getBaseContext());
-        String url = "http://192.168.1.5:8000/api/request";
+        String url = "http://192.168.1.6:8000/api/request";
         StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 Intent i = new Intent(MapsActivity.this, Details.class);
-                startActivity(i);              
+                startActivity(i);
             }
         }, new Response.ErrorListener() {
             @Override
@@ -320,12 +325,34 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 Map<String,String> params = new HashMap<String, String>();
                 params.put("id",value);
                 params.put("ts","1");
-                params.put("src", origin);
-				params.put("dest", dest);
+                params.put("slat", String.valueOf(sourcelat));
+				params.put("slong", String.valueOf(sourcelog));
+            params.put("dlat", String.valueOf(destlat));
+            params.put("dlong", String.valueOf(destlog));
                 return params;
             }
 		};
         MyRequestQueue.add(MyStringRequest);
+
 	}
+
+    public void estfare(){
+        RequestQueue MyRequestQueue = Volley.newRequestQueue(getBaseContext());
+        String url = "http://192.168.1.6:8000/api/estimatefare?origin="+origin+"&dest="+dest;
+        StringRequest MyStringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                estfare1.setText(response);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+                error.printStackTrace();
+            }
+        });
+        MyRequestQueue.add(MyStringRequest);
+
+    }
 	
 }
