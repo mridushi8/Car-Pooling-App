@@ -3,6 +3,7 @@ package com.example.arushi.login;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -45,14 +46,24 @@ public class Details extends AppCompatActivity {
     TextView textViewPhone;
 	Button startJourney;
 	Button cancelTrip;
+	public static final String Userid = "idKey";
+	public static final String MyPREFERENCES = "MyPref" ;
+	SharedPreferences sharedpreferences;
+	String value;
+    Handler handler = new Handler();
 
-	protected void onCreate(Bundle savedInstanceState) {
+
+    protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.details);
+        Toast.makeText(getApplicationContext(), R.string.poll, LENGTH_LONG)
+                .show();
         textViewName = (TextView) findViewById(R.id.textViewName);
         textViewPhone = (TextView) findViewById(R.id.textViewPhone);
 		startJourney = (Button) findViewById(R.id.startButton);
 		cancelTrip = (Button) findViewById(R.id.cancelButton);
+		sharedpreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
+		value = sharedpreferences.getString(Userid, "");
 		getStatus();
         client2 = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
 	}
@@ -77,7 +88,7 @@ public class Details extends AppCompatActivity {
 			@Override
 			protected Map<String, String> getParams() {
 				Map<String, String> params = new HashMap<String, String>();
-				params.put("id", "01");
+				params.put("id", value);
 				return params;
 			}
 		};
@@ -97,18 +108,12 @@ public class Details extends AppCompatActivity {
                 textViewPhone.setText(phone);
             }
             else{
-
-                Context context = getApplicationContext();
-                Toast.makeText(context, R.string.poll, LENGTH_LONG)
-                        .show();
-                Handler handler = new Handler();
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         getStatus();
                     }
-                }, 2000);
-                getStatus();
+                }, 3000);
             }
 		} catch (JSONException e) {
 			e.printStackTrace();
@@ -145,8 +150,33 @@ public class Details extends AppCompatActivity {
 	}
 
 	public void cancelTrip(View view){
-		Intent i = new Intent(Details.this, MapsActivity.class);
-		startActivity(i);
+
+        RequestQueue rq = Volley.newRequestQueue(getBaseContext());
+        String url = "http://192.168.1.6:8000/api/complete";
+        StringRequest sr = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+
+            @Override
+            public void onResponse(String response) {
+                Intent i = new Intent(Details.this, MapsActivity.class);
+                startActivity(i);
+            }
+
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                error.printStackTrace();
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("id", value);
+                return params;
+            }
+        };
+        rq.add(sr);
+
+
 	}
 }
 
