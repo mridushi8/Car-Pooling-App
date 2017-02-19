@@ -136,13 +136,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
                         mMap.addMarker(new MarkerOptions().position(latLng).draggable(true).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
                         mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
-                        estfare();
+                        
                         getDirection();
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
                 dest = (String) place.getName();
+		getestfare();
             }
  
             @Override
@@ -336,10 +337,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 	}
 
-    public void estfare(){
+    public void getestfare(){
         RequestQueue MyRequestQueue = Volley.newRequestQueue(getBaseContext());
-        String url = "http://192.168.1.6:8000/api/estimatefare?origin="+origin+"&dest="+dest;
-        StringRequest MyStringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
+        String url = "http://192.168.1.6:8000/api/estimatefare";
+        StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 estfare1.setText(response);
@@ -350,9 +351,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 error.printStackTrace();
             }
-        });
-        MyRequestQueue.add(MyStringRequest);
+        }){
+            @Override
+            protected Map<String,String> getParams(){
+                Map<String,String> params = new HashMap<String, String>();
 
-    }
+                params.put("origin", origin);
+                params.put("dest", dest);
+                return params;
+            }
+        };
+        MyRequestQueue.add(MyStringRequest);
+	}
 	
 }
