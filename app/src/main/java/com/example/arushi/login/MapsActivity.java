@@ -62,8 +62,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     double sourcelog;
     double destlat;
     double destlog;
-    String origin;
-    String dest;
+    String origin, origins;
+    String dest, dests;
 	public static final String Userid = "idKey";
 	public static final String MyPREFERENCES = "MyPref" ;
 	SharedPreferences sharedpreferences;
@@ -336,8 +336,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         MyRequestQueue.add(MyStringRequest);
 
 	}
+	
+	public String makeURL1 (double lat, double log){
+		StringBuilder urlString = new StringBuilder();
+
+		urlString.append(Double.toString(lat));
+		urlString.append(",");
+		urlString.append(Double.toString(log));
+
+		return String.valueOf(urlString);
+
+	    }
 
     public void getestfare(){
+	origins = makeURL1(sourcelat, sourcelog);
+        dests = makeURL1(destlat, destlog);
         RequestQueue MyRequestQueue = Volley.newRequestQueue(getBaseContext());
         String url = "http://192.168.1.6:8000/api/estimatefare";
         StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
@@ -356,8 +369,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             protected Map<String,String> getParams(){
                 Map<String,String> params = new HashMap<String, String>();
 
-                params.put("origin", origin);
-                params.put("dest", dest);
+                params.put("origin", origins);
+                params.put("dest", dests);
                 return params;
             }
         };
