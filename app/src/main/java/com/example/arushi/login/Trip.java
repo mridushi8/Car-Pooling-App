@@ -1,11 +1,9 @@
 package com.example.arushi.login;
-
+import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
-
-package com.carpool.maptask;
-
-import android.content.pm.PackageManager;
-
+import java.sql.Time;
+import java.util.Date;
 import android.graphics.Color;
 import android.location.Location;
 import android.net.Uri;
@@ -16,8 +14,16 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.appindexing.Thing;
@@ -38,6 +44,11 @@ import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+import static android.widget.Toast.LENGTH_LONG;
 
 /**
  * Created by ARATI on 2/11/2017.
@@ -49,11 +60,15 @@ public class Trip extends FragmentActivity implements OnMapReadyCallback, Google
 
     private GoogleMap mMap;
     private GoogleApiClient client;
-    Location mLastLocation;
+    Location mLastLocation, mCurrentLocation;
+    Date mLastUpdateTime, startTime;
     Marker mCurrLocationMarker;
     LocationRequest mLocationRequest;
 	private ArrayList<LatLng> points;
-	Polyline line; 
+	Polyline line;
+    float distanceTillNow = 0;
+    TextView dist, dist1, actfare;
+
 
 
     @Override
@@ -81,7 +96,10 @@ public class Trip extends FragmentActivity implements OnMapReadyCallback, Google
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
        setContentView(R.layout.trip);
-	   points = new ArrayList<LatLng>();
+        dist = (TextView) findViewById(R.id.dist);
+        dist1 = (TextView) findViewById(R.id.dist1);
+        actfare = (TextView) findViewById(R.id.actfare);
+        points = new ArrayList<LatLng>();
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             checkLocationPermission();
         }
@@ -127,6 +145,13 @@ public class Trip extends FragmentActivity implements OnMapReadyCallback, Google
 
     @Override
     public void onLocationChanged(Location location) {
+
+        float distance = location.distanceTo(mCurrentLocation);
+        distanceTillNow = distanceTillNow + distance;
+        dist1.setText(String.valueOf(distanceTillNow));
+        mCurrentLocation = location;
+        mLastUpdateTime = new Date();
+        startTime = new Date();
         mLastLocation = location;
         if (mCurrLocationMarker != null) {
             mCurrLocationMarker.remove();
@@ -265,4 +290,39 @@ public class Trip extends FragmentActivity implements OnMapReadyCallback, Google
 
 		line = mMap.addPolyline(options); //add Polyline
 	}
+
+    public void onSubmit(View view) {
+        RequestQueue MyRequestQueue = Volley.newRequestQueue(getBaseContext());
+        String url = "http://192.168.1.8:8000/api/actfare";
+        StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                actfare.setText(response);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Context context = getApplicationContext();
+                Toast.makeText(context, R.string.fail, LENGTH_LONG)
+                        .show();
+                error.printStackTrace();
+            }
+        }){
+            @Override
+            protected Map<String,String> getParams(){
+                Map<String,String> params = new HashMap<String, String>();
+                params.put("id","01");
+                params.put("distance", String.valueOf(distanceTillNow));
+                params.put("startTime", String.valueOf(startTime));
+                return params;
+            }
+        };
+        MyRequestQueue.add(MyStringRequest);
+
+    }
+
+    public void onPaym(View view) {
+        Intent i = new Intent(Trip.this, Trip.class);
+        startActivity(i);
+    }
 }
