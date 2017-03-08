@@ -2,6 +2,11 @@ package com.example.arushi.login;
 
 import android.content.pm.PackageManager;
 
+package com.carpool.maptask;
+
+import android.content.pm.PackageManager;
+
+import android.graphics.Color;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Build;
@@ -29,6 +34,10 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
+
+import java.util.ArrayList;
 
 /**
  * Created by ARATI on 2/11/2017.
@@ -43,6 +52,8 @@ public class Trip extends FragmentActivity implements OnMapReadyCallback, Google
     Location mLastLocation;
     Marker mCurrLocationMarker;
     LocationRequest mLocationRequest;
+	private ArrayList<LatLng> points;
+	Polyline line; 
 
 
     @Override
@@ -70,6 +81,7 @@ public class Trip extends FragmentActivity implements OnMapReadyCallback, Google
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
        setContentView(R.layout.trip);
+	   points = new ArrayList<LatLng>();
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             checkLocationPermission();
         }
@@ -119,9 +131,11 @@ public class Trip extends FragmentActivity implements OnMapReadyCallback, Google
         if (mCurrLocationMarker != null) {
             mCurrLocationMarker.remove();
         }
-
-        //Place current location marker
+		
+	//Place current location marker
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+		points.add(latLng);
+		redrawLine();
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(latLng);
         markerOptions.title("Current Position");
@@ -130,7 +144,7 @@ public class Trip extends FragmentActivity implements OnMapReadyCallback, Google
 
         //move map camera
         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(20));
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(10));
 
         //stop location updates
         if (client != null) {
@@ -238,4 +252,17 @@ public class Trip extends FragmentActivity implements OnMapReadyCallback, Google
             // You can add here other case statements according to your requirement.
         }
     }
+	
+	private void redrawLine(){
+
+    mMap.clear();  //clears all Markers and Polylines
+
+    PolylineOptions options = new PolylineOptions().width(5).color(Color.BLUE).geodesic(true);
+    for (int i = 0; i < points.size(); i++) {
+        LatLng point = points.get(i);
+        options.add(point);
+    }
+
+		line = mMap.addPolyline(options); //add Polyline
+	}
 }
