@@ -8,7 +8,8 @@
     android:orientation="vertical"
     tools:context="com.carpool.maptask.MapsActivity">
 
-       <LinearLayout
+
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
@@ -20,51 +21,5 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             tools:context="com.carpool.maptask.MapsActivity" />
-    </LinearLayout>
-
-
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/dist"
-            android:text="Distance:  "/>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/dist1" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/actfare"
-            android:text=" (CLICK SUBMIT!) "/>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <Button
-            style="?android:attr/buttonStyleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Submit"
-            android:id="@+id/Bsearch"
-
-            android:onClick="onSubmit" />
-        <Button
-            style="?android:attr/buttonStyleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Payment"
-            android:id="@+id/payment"
-
-            android:onClick="onPaym" />
     </LinearLayout>
 </LinearLayout>

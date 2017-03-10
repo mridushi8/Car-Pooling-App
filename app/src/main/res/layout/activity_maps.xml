@@ -15,7 +15,6 @@
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:name="com.google.android.gms.location.places.ui.PlaceAutocompleteFragment"
-            android:hint="Enter Source"
 		xmlns:android="http://schemas.android.com/apk/res/android" />
 	</LinearLayout>
 	<LinearLayout
@@ -27,7 +26,6 @@
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:name="com.google.android.gms.location.places.ui.PlaceAutocompleteFragment"
-            android:hint="Enter Destination"
 		/>
 		<Button
             style="?android:attr/buttonStyleSmall"
@@ -42,22 +40,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
-		<TextView
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:id="@+id/estfare"
-			android:text="Estimate Fare: Rs. "/>
-		<TextView
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:id="@+id/estfare1"
-			android:text=" (Input Locations!)"/>
-		
-	</LinearLayout>
-	<LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
 		<fragment xmlns:android="http://schemas.android.com/apk/res/android"
 			xmlns:map="http://schemas.android.com/apk/res-auto"
 			xmlns:tools="http://schemas.android.com/tools"
@@ -66,7 +48,5 @@
 			android:layout_width="match_parent"
 			android:layout_height="match_parent"
 			tools:context="com.carpool.maptask.MapsActivity" />
-
 	</LinearLayout>
-    
 </LinearLayout>

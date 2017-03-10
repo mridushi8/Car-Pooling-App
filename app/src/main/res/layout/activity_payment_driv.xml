@@ -8,7 +8,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.example.arushi.login.payment_pass">
+    tools:context="com.example.pratibhaswami.myapp.payment_pass">
 
     <TextView
         android:text="Your fare for the trip is:"
@@ -42,7 +42,7 @@
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="120dp"
         android:id="@+id/checkBox2"
-        android:textSize="@dimen/place_autocomplete_prediction_primary_text"
+
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 
