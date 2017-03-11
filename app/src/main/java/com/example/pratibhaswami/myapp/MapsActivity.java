@@ -8,14 +8,13 @@ import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.net.Uri;
-import android.os.Build;
-import android.os.Bundle;
-import android.support.annotation.RequiresApi;
 import android.support.v4.app.FragmentActivity;
+import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
-
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -34,6 +33,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
@@ -62,15 +62,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     double sourcelog;
     double destlat;
     double destlog;
-    String origin;
-    String dest;
+    String origin, origins;
+    String dest, dests;
 	public static final String Userid = "idKey";
 	public static final String MyPREFERENCES = "MyPref" ;
 	SharedPreferences sharedpreferences;
 	String value;
-	
+	TextView estfare;
+    TextView estfare1;
  
-    @RequiresApi(api = Build.VERSION_CODES.HONEYCOMB)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,6 +78,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+        estfare = (TextView) findViewById (R.id.estfare);
+        estfare1 = (TextView) findViewById (R.id.estfare1);
  
         autocompleteFragment =
                 (PlaceAutocompleteFragment) getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
@@ -99,7 +101,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         sourcelat = address.getLatitude();
                         sourcelog = address.getLongitude();
                         LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
-                        mMap.addMarker(new MarkerOptions().position(latLng).draggable(true));
+                        mMap.addMarker(new MarkerOptions().position(latLng).draggable(true).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
                         mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
                     }
                 } catch (IOException e) {
@@ -132,14 +134,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         destlat = address.getLatitude();
                         destlog = address.getLongitude();
                         LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
-                        mMap.addMarker(new MarkerOptions().position(latLng).draggable(true));
+                        mMap.addMarker(new MarkerOptions().position(latLng).draggable(true).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
                         mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
+                        
                         getDirection();
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
                 dest = (String) place.getName();
+		getestfare();
             }
  
             @Override
@@ -215,7 +219,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Polyline line = mMap.addPolyline(new PolylineOptions()
                     .addAll(list)
                     .width(10)
-                    .color(Color.RED)
+                    .color(Color.BLUE)
                     .geodesic(true)
             );
 
@@ -272,7 +276,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
  
     public void onClick(View view) {
 		sendDetails();
- 
     }
 
     public Action getIndexApiAction() {
@@ -302,18 +305,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 	
 	public void sendDetails(){
 		RequestQueue MyRequestQueue = Volley.newRequestQueue(getBaseContext());
-        String url = "http://192.168.43.175:8000/api/request";
+        String url = "http://192.168.1.6:8000/api/request";
         StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 Intent i = new Intent(MapsActivity.this, Details.class);
-                startActivity(i);              
+                startActivity(i);
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Context context = getApplicationContext();
-                Toast.makeText(context, "fail" , LENGTH_LONG)
+                Toast.makeText(context, R.string.fail, LENGTH_LONG)
                         .show();
                 error.printStackTrace();
             }
@@ -323,12 +326,56 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 Map<String,String> params = new HashMap<String, String>();
                 params.put("id",value);
                 params.put("ts","1");
-                params.put("src", origin);
-				params.put("dest", dest);
+                params.put("slat", String.valueOf(sourcelat));
+				params.put("slong", String.valueOf(sourcelog));
+            params.put("dlat", String.valueOf(destlat));
+            params.put("dlong", String.valueOf(destlog));
                 return params;
             }
 		};
         MyRequestQueue.add(MyStringRequest);
+
+	}
+	
+	public String makeURL1 (double lat, double log){
+		StringBuilder urlString = new StringBuilder();
+
+		urlString.append(Double.toString(lat));
+		urlString.append(",");
+		urlString.append(Double.toString(log));
+
+		return String.valueOf(urlString);
+
+	    }
+
+    public void getestfare(){
+	origins = makeURL1(sourcelat, sourcelog);
+        dests = makeURL1(destlat, destlog);
+        RequestQueue MyRequestQueue = Volley.newRequestQueue(getBaseContext());
+        String url = "http://192.168.1.6:8000/api/estimatefare";
+        StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                estfare1.setText(response);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+                error.printStackTrace();
+            }
+        }){
+            @Override
+            protected Map<String,String> getParams(){
+                Map<String,String> params = new HashMap<String, String>();
+
+                params.put("origin", origins);
+                params.put("dest", dests);
+                return params;
+            }
+        };
+        MyRequestQueue.add(MyStringRequest);
 	}
 	
 }
+

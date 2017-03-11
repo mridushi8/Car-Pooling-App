@@ -1,4 +1,10 @@
 <resources>
-    <string name="app_name">MyApp</string>
+    <string name="app_name">ACMS Car Pool</string>
     <string name="title_activity_maps">ACMS</string>
+	
+    <string name="popup">Successfully Submitted</string>
+    <string name="fail">Failed to Submit</string>
+    <string name="serverAddress">http://192.168.1.8:8000</string>
+    
+    <string name="poll">Getting driver details, Please Wait.</string>
 </resources>

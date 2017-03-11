@@ -2,8 +2,8 @@
         apply plugin: 'com.android.application'
 
         android {
-            compileSdkVersion 24
-            buildToolsVersion "23.0.3"
+            compileSdkVersion 25
+            buildToolsVersion "25.0.2"
 
             defaultConfig {
                 applicationId "com.onesignal.example"
@@ -13,13 +13,14 @@
                                         // Project number pulled from dashboard, local value is ignored.
                                         onesignal_google_project_number: "REMOTE"]
 
-                minSdkVersion 10
-                targetSdkVersion 24
-                versionName "1.0"
+                minSdkVersion 15
+				targetSdkVersion 25
+				versionCode 1
+				versionName "1.0"
             }
             buildTypes {
                 release {
-                    minifyEnabled false
+                    minifyEnabled true
                     proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
                 }
             }
@@ -38,10 +39,11 @@
             // Required for geotagging
             compile 'com.google.android.gms:play-services-location:+'
 
-            compile 'com.android.support:appcompat-v7:+'
+            compile 'com.android.support:appcompat-v7:25.1.0'
 
             // play-services-analytics is only needed when using 8.1.0 or older.
             // compile 'com.google.android.gms:play-services-analytics:+'
             compile 'com.android.volley:volley:1.0.0'
-            compile 'com.google.android.gms:play-services:10.0.1'
+            testCompile 'junit:junit:4.12'
+    compile 'com.google.android.gms:play-services:9.0.1'
         }
