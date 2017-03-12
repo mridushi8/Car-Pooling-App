@@ -93,7 +93,7 @@ public class MainActivity1 extends AppCompatActivity {
     public void getStatus() {
         loading = ProgressDialog.show(this, "Fetching Driver Details", "Please wait..", false, false);
         RequestQueue rq = Volley.newRequestQueue(getBaseContext());
-        String url = "http://192.168.43.175:8000/api/get_passenger";
+        String url = "http://192.168.1.8:8000/api/get_passenger";
         StringRequest sr = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
 
             @Override

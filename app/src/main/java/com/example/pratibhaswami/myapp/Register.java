@@ -73,7 +73,7 @@ public class Register extends AppCompatActivity {
                 {
 
                 RequestQueue MyRequestQueue = Volley.newRequestQueue(getBaseContext());
-                String url= "http://192.168.43.175:8000/register";
+                String url= "http://192.168.1.8:8000/register";
                 StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>(){
                     @Override
                     public void onResponse(String response) {

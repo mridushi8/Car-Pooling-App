@@ -86,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
                                                 newpass = UUID.randomUUID().toString().replaceAll("-", "").substring(0,10);
                                                 System.out.println(newpass);
                                                 RequestQueue MyRequestQueue = Volley.newRequestQueue(getBaseContext());
-                                                String url= "http://172.16.32.75:8000/forgetpass";
+                                                String url= "http://192.168.1.8:8000/forgetpass";
                                                 StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>(){
                                                     @Override
                                                     public void onResponse(String response) {
@@ -174,7 +174,7 @@ public class MainActivity extends AppCompatActivity {
                     Pass = pass.getText().toString();
 
                     RequestQueue MyRequestQueue = Volley.newRequestQueue(getBaseContext());
-                    String url= "http://192.168.43.175:8000/checkmatch";
+                    String url= "http://192.168.1.8:8000/checkmatch";
                     StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>(){
                         @Override
                         public void onResponse(String response) {

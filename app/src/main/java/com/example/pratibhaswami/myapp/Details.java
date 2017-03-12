@@ -51,6 +51,7 @@ public class Details extends AppCompatActivity {
 	public static final String MyPREFERENCES = "MyPref" ;
 	SharedPreferences sharedpreferences;
 	String value;
+	ProgressDialog loading;
     Handler handler = new Handler();
 
 
@@ -155,7 +156,7 @@ public class Details extends AppCompatActivity {
 	public void cancelTrip(View view){
 
         RequestQueue rq = Volley.newRequestQueue(getBaseContext());
-        String url = "http://192.168.1.6:8000/api/complete";
+        String url = "http://192.168.1.8:8000/api/complete";
         StringRequest sr = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
 
             @Override

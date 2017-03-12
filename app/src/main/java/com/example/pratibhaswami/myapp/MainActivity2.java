@@ -97,7 +97,7 @@ public class MainActivity2 extends AppCompatActivity {
     public void Respond() {
         //loading = ProgressDialog.show(this, "Fetching Driver Details", "Please wait..", false, false);
         RequestQueue rq = Volley.newRequestQueue(getBaseContext());
-        String url = "http://192.168.43.175:8000/api/response";
+        String url = "http://192.168.1.8:8000/api/response";
         StringRequest sr = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String rsp) {

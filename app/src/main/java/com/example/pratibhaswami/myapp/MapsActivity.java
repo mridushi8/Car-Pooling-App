@@ -305,7 +305,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 	
 	public void sendDetails(){
 		RequestQueue MyRequestQueue = Volley.newRequestQueue(getBaseContext());
-        String url = "http://192.168.1.6:8000/api/request";
+        String url = "http://192.168.1.8:8000/api/request";
         StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -352,7 +352,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 	origins = makeURL1(sourcelat, sourcelog);
         dests = makeURL1(destlat, destlog);
         RequestQueue MyRequestQueue = Volley.newRequestQueue(getBaseContext());
-        String url = "http://192.168.1.6:8000/api/estimatefare";
+        String url = "http://192.168.1.8:8000/api/estimatefare";
         StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {

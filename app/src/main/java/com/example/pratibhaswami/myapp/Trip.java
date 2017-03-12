@@ -1,10 +1,13 @@
 package com.example.pratibhaswami.myapp;
 
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+
 import java.sql.Time;
 import java.util.Date;
+
 import android.graphics.Color;
 import android.location.Location;
 import android.net.Uri;
@@ -65,12 +68,29 @@ public class Trip extends FragmentActivity implements OnMapReadyCallback, Google
     Date mLastUpdateTime, startTime;
     Marker mCurrLocationMarker;
     LocationRequest mLocationRequest;
-	private ArrayList<LatLng> points;
-	Polyline line;
+    private ArrayList<LatLng> points;
+    Polyline line;
     float distanceTillNow = 0;
-    TextView dist, dist1, actfare;
+    TextView dist, dist1, dist2;
 
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.trip);
+        dist = (TextView) findViewById(R.id.dist);
+        dist1 = (TextView) findViewById(R.id.dist1);
+        dist2 = (TextView) findViewById(R.id.dist2);
+        points = new ArrayList<LatLng>();
+        //if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+          //  checkLocationPermission();
+        //}
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
 
+        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
+
+    }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -90,97 +110,20 @@ public class Trip extends FragmentActivity implements OnMapReadyCallback, Google
             buildGoogleApiClient();
             mMap.setMyLocationEnabled(true);
         }
-
     }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-       setContentView(R.layout.trip);
-        dist = (TextView) findViewById(R.id.dist);
-        dist1 = (TextView) findViewById(R.id.dist1);
-        actfare = (TextView) findViewById(R.id.actfare);
-        points = new ArrayList<LatLng>();
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            checkLocationPermission();
-        }
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
-        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
-
-    }
-
-
-    public Action getIndexApiAction() {
-        Thing object = new Thing.Builder()
-                .setName("Trip Page") // TODO: Define a title for the content shown.
-                // TODO: Make sure this auto-generated URL is correct.
-                .setUrl(Uri.parse("http://[ENTER-YOUR-URL-HERE]"))
+    protected synchronized void buildGoogleApiClient() {
+        client = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
                 .build();
-        return new Action.Builder(Action.TYPE_VIEW)
-                .setObject(object)
-                .setActionStatus(Action.STATUS_TYPE_COMPLETED)
-                .build();
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
         client.connect();
-        AppIndex.AppIndexApi.start(client, getIndexApiAction());
     }
 
     @Override
-    public void onStop() {
-        super.onStop();
+    public void onConnected(Bundle bundle) {
 
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        AppIndex.AppIndexApi.end(client, getIndexApiAction());
-        client.disconnect();
-    }
-
-    @Override
-    public void onLocationChanged(Location location) {
-
-        float distance = location.distanceTo(mCurrentLocation);
-        distanceTillNow = distanceTillNow + distance;
-        dist1.setText(String.valueOf(distanceTillNow));
-        mCurrentLocation = location;
-        mLastUpdateTime = new Date();
-        startTime = new Date();
-        mLastLocation = location;
-        if (mCurrLocationMarker != null) {
-            mCurrLocationMarker.remove();
-        }
-		
-	//Place current location marker
-        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-		points.add(latLng);
-		redrawLine();
-        MarkerOptions markerOptions = new MarkerOptions();
-        markerOptions.position(latLng);
-        markerOptions.title("Current Position");
-        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
-        mCurrLocationMarker = mMap.addMarker(markerOptions);
-
-        //move map camera
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(10));
-
-        //stop location updates
-        if (client != null) {
-            LocationServices.FusedLocationApi.removeLocationUpdates(client, this);
-        }
-
-    }
-
-   @Override
-    public void onConnected(@Nullable Bundle bundle) {
         mLocationRequest = new LocationRequest();
         mLocationRequest.setInterval(1000);
         mLocationRequest.setFastestInterval(1000);
@@ -191,7 +134,6 @@ public class Trip extends FragmentActivity implements OnMapReadyCallback, Google
             LocationServices.FusedLocationApi.requestLocationUpdates(client, mLocationRequest, this);
         }
 
-
     }
 
     @Override
@@ -200,17 +142,35 @@ public class Trip extends FragmentActivity implements OnMapReadyCallback, Google
     }
 
     @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+    public void onLocationChanged(Location location) {
+                mLastLocation = location;
+        if (mCurrLocationMarker != null) {
+            mCurrLocationMarker.remove();
+        }
+
+        //Place current location marker
+        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+        points.add(latLng);
+        MarkerOptions markerOptions = new MarkerOptions();
+        markerOptions.position(latLng);
+        markerOptions.title("Current Position");
+        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
+        mCurrLocationMarker = mMap.addMarker(markerOptions);
+
+        //move map camera
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(21));
+
+        //stop location updates
+        if (client != null) {
+            LocationServices.FusedLocationApi.removeLocationUpdates(client, this);
+        }
 
     }
 
-    protected synchronized void buildGoogleApiClient() {
-        client = new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API)
-                .build();
-        client.connect();
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+
     }
 
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
@@ -292,7 +252,7 @@ public class Trip extends FragmentActivity implements OnMapReadyCallback, Google
 		line = mMap.addPolyline(options); //add Polyline
 	}
 
-    public void onSubmit(View view) {
+    /**public void onSubmit(View view) {
         RequestQueue MyRequestQueue = Volley.newRequestQueue(getBaseContext());
         String url = "http://192.168.1.8:8000/api/actfare";
         StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
@@ -325,5 +285,5 @@ public class Trip extends FragmentActivity implements OnMapReadyCallback, Google
     public void onPaym(View view) {
         Intent i = new Intent(Trip.this, Trip.class);
         startActivity(i);
-    }
+    }**/
 }

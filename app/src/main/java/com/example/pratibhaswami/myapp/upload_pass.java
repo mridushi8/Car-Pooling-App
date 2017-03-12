@@ -47,7 +47,7 @@ public class upload_pass extends AppCompatActivity implements View.OnClickListen
 
     private int PICK_IMAGE_REQUEST = 1;
 
-    private String UPLOAD_URL = "http://192.168.43.175:8000/picupload";
+    private String UPLOAD_URL = "http://192.168.1.8:8000/picupload";
 
     private String KEY_IMAGE = "image";
     private String KEY_NAME = "name";

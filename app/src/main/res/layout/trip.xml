@@ -8,22 +8,6 @@
     android:orientation="vertical"
     tools:context="com.carpool.maptask.MapsActivity">
 
-       <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <fragment xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:map="http://schemas.android.com/apk/res-auto"
-            xmlns:tools="http://schemas.android.com/tools"
-            android:id="@+id/map"
-            android:name="com.google.android.gms.maps.SupportMapFragment"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            tools:context="com.carpool.maptask.MapsActivity" />
-    </LinearLayout>
-
-
-
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -36,12 +20,15 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/dist1" />
+            android:id="@+id/dist1"
+            android:text = " "/>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/actfare"
-            android:text=" (CLICK SUBMIT!) "/>
+            android:id="@+id/dist2"
+            android:text = "  kms "/>
+
+
 
     </LinearLayout>
 
@@ -67,4 +54,22 @@
 
             android:onClick="onPaym" />
     </LinearLayout>
+
+       <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:map="http://schemas.android.com/apk/res-auto"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:id="@+id/map"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:context="com.carpool.maptask.MapsActivity" />
+    </LinearLayout>
+
+
+
+
 </LinearLayout>
