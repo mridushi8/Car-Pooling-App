@@ -143,6 +143,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     e.printStackTrace();
                 }
                 dest = (String) place.getName();
+
 		getestfare();
             }
  

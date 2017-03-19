@@ -13,8 +13,9 @@
                                         // Project number pulled from dashboard, local value is ignored.
                                         onesignal_google_project_number: "REMOTE"]
 
-                minSdkVersion 15
+                minSdkVersion 21
 				targetSdkVersion 25
+                multiDexEnabled true
 				versionCode 1
 				versionName "1.0"
             }
@@ -23,6 +24,10 @@
                     minifyEnabled true
                     proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
                 }
+            }
+
+            dexOptions{
+                javaMaxHeapSize "4g"
             }
         }
 

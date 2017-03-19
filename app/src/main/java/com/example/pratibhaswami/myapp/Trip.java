@@ -156,6 +156,13 @@ public class Trip extends FragmentActivity implements OnMapReadyCallback, Google
         markerOptions.title("Current Position");
         markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
         mCurrLocationMarker = mMap.addMarker(markerOptions);
+        PolylineOptions options = new PolylineOptions().width(5).color(Color.BLUE).geodesic(true);
+        for (int i = 0; i < points.size(); i++) {
+            LatLng point = points.get(i);
+            options.add(point);
+        }
+
+        line = mMap.addPolyline(options); //add Polyline
 
         //move map camera
         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
