@@ -38,38 +38,26 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import static android.widget.Toast.LENGTH_LONG;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
  
     private GoogleMap mMap;
-    private static final String TAG = "Bla";
-    PlaceAutocompleteFragment autocompleteFragment;
-    PlaceAutocompleteFragment autocompleteFragment1;
+    PlaceAutocompleteFragment autocompleteFragment, autocompleteFragment1;
     private GoogleApiClient client;
-    double sourcelat;
-    double sourcelog;
-    double destlat;
-    double destlog;
-    String origin, origins;
-    String dest, dests;
-	public static final String Userid = "idKey";
-	public static final String MyPREFERENCES = "MyPref" ;
-	SharedPreferences sharedpreferences;
-	String value;
-	TextView estfare;
-    TextView estfare1;
+    double sourcelat,sourcelog,destlat, destlog;
+    String origin, origins, dest, dests, value;
+    public static final String Userid = "idKey", MyPREFERENCES = "MyPref", TAG = "Bla";
+    SharedPreferences sharedpreferences;
+    TextView estfare,estfare1;
  
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,7 +80,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onPlaceSelected(Place place) {
                 Log.i(TAG, "Place: " + place.getName());
                 String location = (String) place.getAddress();
-
                 Geocoder geocoder = new Geocoder(getBaseContext());
                 try {
                     List addressList = geocoder.getFromLocationName(location, 1);
@@ -125,7 +112,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onPlaceSelected(Place place) {
                 Log.i(TAG, "Place: " + place.getName());
                 String location = (String) place.getAddress();
-
                 Geocoder geocoder = new Geocoder(getBaseContext());
                 try {
                     List addressList = geocoder.getFromLocationName(location, 1);
@@ -136,7 +122,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
                         mMap.addMarker(new MarkerOptions().position(latLng).draggable(true).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
                         mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
-                        
                         getDirection();
                     }
                 } catch (IOException e) {
@@ -153,8 +138,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
 		 
         });
-		sharedpreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);	
-	    value = sharedpreferences.getString(Userid, "");
+	sharedpreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);	
+	value = sharedpreferences.getString(Userid, "");
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 
@@ -164,11 +149,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         urlString.append("?origin=");// from
         urlString.append(Double.toString(sourcelat));
         urlString.append(",");
-        urlString
-                .append(Double.toString( sourcelog));
+        urlString.append(Double.toString( sourcelog));
         urlString.append("&destination=");// to
-        urlString
-                .append(Double.toString( destlat));
+        urlString.append(Double.toString( destlat));
         urlString.append(",");
         urlString.append(Double.toString(destlog));
         urlString.append("&sensor=false&mode=driving&alternatives=true");
@@ -177,19 +160,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void getDirection(){
-        //Getting the URL
         String url = makeURL(sourcelat, sourcelog, destlat, destlog);
-
-        //Showing a dialog till we get the route
         final ProgressDialog loading = ProgressDialog.show(this, "Getting Route", "Please wait...", false, false);
-
-        //Creating a string request
-        StringRequest stringRequest = new StringRequest(url,
+	StringRequest stringRequest = new StringRequest(url,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
                         loading.dismiss();
-                        //Calling the method drawPath to draw the path
                         drawPath(response);
                     }
                 },
@@ -199,18 +176,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         loading.dismiss();
                     }
                 });
-
-        //Adding the request to request queue
         RequestQueue requestQueue = Volley.newRequestQueue(this);
         requestQueue.add(stringRequest);
     }
 
     public void drawPath(String  result) {
-        //Getting both the coordinates
+       
         LatLng from = new LatLng(sourcelat,sourcelog);
         LatLng to = new LatLng(destlat,destlog);
         try {
-            //Parsing json
+            
             final JSONObject json = new JSONObject(result);
             JSONArray routeArray = json.getJSONArray("routes");
             JSONObject routes = routeArray.getJSONObject(0);
@@ -306,45 +281,43 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 	
 	public void sendDetails(){
 		RequestQueue MyRequestQueue = Volley.newRequestQueue(getBaseContext());
-        String url = "http://192.168.1.8:8000/api/request";
-        StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                Intent i = new Intent(MapsActivity.this, Details.class);
-                startActivity(i);
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Context context = getApplicationContext();
-                Toast.makeText(context, R.string.fail, LENGTH_LONG)
-                        .show();
-                error.printStackTrace();
-            }
-        }){
-		@Override
-            protected Map<String,String> getParams(){
-                Map<String,String> params = new HashMap<String, String>();
-                params.put("id",value);
-                params.put("ts","1");
-                params.put("slat", String.valueOf(sourcelat));
-				params.put("slong", String.valueOf(sourcelog));
-            params.put("dlat", String.valueOf(destlat));
-            params.put("dlong", String.valueOf(destlog));
-                return params;
-            }
+		String url = "http://192.168.1.8:8000/api/request";
+		StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+		    @Override
+		    public void onResponse(String response) {
+			Intent i = new Intent(MapsActivity.this, Details.class);
+			startActivity(i);
+		    }
+		}, new Response.ErrorListener() {
+		    @Override
+		    public void onErrorResponse(VolleyError error) {
+			Context context = getApplicationContext();
+			Toast.makeText(context, R.string.fail, LENGTH_LONG)
+				.show();
+			error.printStackTrace();
+		    }
+		}){
+			@Override
+		    protected Map<String,String> getParams(){
+			Map<String,String> params = new HashMap<String, String>();
+			params.put("id",value);
+			params.put("ts","1");
+			params.put("slat", String.valueOf(sourcelat));
+			params.put("slong", String.valueOf(sourcelog));
+		        params.put("dlat", String.valueOf(destlat));
+		        params.put("dlong", String.valueOf(destlog));
+			return params;
+		    }
 		};
-        MyRequestQueue.add(MyStringRequest);
+		MyRequestQueue.add(MyStringRequest);
 
 	}
 	
 	public String makeURL1 (double lat, double log){
 		StringBuilder urlString = new StringBuilder();
-
 		urlString.append(Double.toString(lat));
 		urlString.append(",");
 		urlString.append(Double.toString(log));
-
 		return String.valueOf(urlString);
 
 	    }
