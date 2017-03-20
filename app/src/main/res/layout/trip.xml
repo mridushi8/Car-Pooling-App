@@ -8,30 +8,7 @@
     android:orientation="vertical"
     tools:context="com.carpool.maptask.MapsActivity">
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/dist"
-            android:text="Distance:  "/>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/dist1"
-            android:text = " "/>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/dist2"
-            android:text = "  kms "/>
-
-
-
-    </LinearLayout>
-
+   
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -41,9 +18,8 @@
             style="?android:attr/buttonStyleSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Submit"
+            android:text="Reached Dest"
             android:id="@+id/Bsearch"
-
             android:onClick="onSubmit" />
         <Button
             style="?android:attr/buttonStyleSmall"

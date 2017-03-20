@@ -1,23 +1,19 @@
 package com.example.pratibhaswami.myapp;
 
-import android.app.ProgressDialog;
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import java.sql.Time;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import android.graphics.Color;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
@@ -48,15 +44,10 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 import static android.widget.Toast.LENGTH_LONG;
 
@@ -64,7 +55,7 @@ import static android.widget.Toast.LENGTH_LONG;
  * Created by ARATI on 2/11/2017.
  */
 
-public class Trip extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
+public class Trip_driv extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         LocationListener {
 
@@ -82,16 +73,16 @@ public class Trip extends FragmentActivity implements OnMapReadyCallback, Google
 	public static final String MyPREFERENCES = "MyPref" ;
 	SharedPreferences sharedpreferences;
 	String value;
-    Handler handler;
-    ProgressDialog loading;
-    String timeStamp = new SimpleDateFormat("MMM dd YYYY HH:mm").format(Calendar.getInstance().getTime());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.trip);
+
         points = new ArrayList<LatLng>();
-        handler = new Handler();
+        //if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+          //  checkLocationPermission();
+        //}
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -152,11 +143,10 @@ public class Trip extends FragmentActivity implements OnMapReadyCallback, Google
 
     @Override
     public void onLocationChanged(Location location) {
-		float distance = location.distanceTo(mCurrentLocation);
+        float distance = location.distanceTo(mCurrentLocation);
         distanceTillNow = distanceTillNow + distance;
         mCurrentLocation = location;
         mLastUpdateTime = new Date();
-        
         if (mCurrLocationMarker != null) {
             mCurrLocationMarker.remove();
         }
@@ -261,78 +251,72 @@ public class Trip extends FragmentActivity implements OnMapReadyCallback, Google
 	
 	private void redrawLine(){
 
-		mMap.clear();
+    mMap.clear();  //clears all Markers and Polylines
 
-		PolylineOptions options = new PolylineOptions().width(5).color(Color.BLUE).geodesic(true);
-		for (int i = 0; i < points.size(); i++) {
-			LatLng point = points.get(i);
-			options.add(point);
-		}
+    PolylineOptions options = new PolylineOptions().width(5).color(Color.BLUE).geodesic(true);
+    for (int i = 0; i < points.size(); i++) {
+        LatLng point = points.get(i);
+        options.add(point);
+    }
 
 		line = mMap.addPolyline(options); //add Polyline
 	}
 
     public void onSubmit(View view) {
-        Context context = getApplicationContext();
-        Toast.makeText(context, "Make Payment!", LENGTH_LONG).show();
+        RequestQueue MyRequestQueue = Volley.newRequestQueue(getBaseContext());
+        String url = "http://192.168.1.8:8000/endjourney";
+        StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Context context = getApplicationContext();
+                Toast.makeText(context, R.string.fail, LENGTH_LONG)
+                        .show();
+                error.printStackTrace();
+            }
+        }){
+            @Override
+            protected Map<String,String> getParams(){
+                Map<String,String> params = new HashMap<String, String>();
+                params.put("id",value);
+                return params;
+            }
+        };
+        MyRequestQueue.add(MyStringRequest);
 
     }
 
     public void onPaym(View view) {
 		
-		getStatus();
-        
-    }
-	
-	@RequiresApi(api = Build.VERSION_CODES.KITKAT)
-	private void showJSON(String json) {
-		loading.dismiss();
-		try {
-			JSONObject reader = new JSONObject(json);
-			String status = reader.getString("status");
-            if(Objects.equals(status, "404")){
-                Intent i = new Intent(Trip.this, payment_pass.class);
-                i.putExtra("distance", distanceTillNow);
-                i.putExtra("startTime", timeStamp);
-				startActivity(i);
-            }
-            else{
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        getStatus();
-                    }
-                }, 2000);
-            }
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-	}
-
-    public void getStatus(){
-        loading = ProgressDialog.show(this, "Redirecting", "Please wait..", false, false);
-        RequestQueue rq = Volley.newRequestQueue(getBaseContext());
-        String url = "http://192.168.1.6:8000/api/status";
-        StringRequest sr = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
-
-            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+		RequestQueue MyRequestQueue = Volley.newRequestQueue(getBaseContext());
+        String url = "http://192.168.1.8:8000/driver_complete";
+        StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
-            public void onResponse(String rsp) {
-                showJSON(rsp);
+            public void onResponse(String response) {
+                Intent i = new Intent(Trip_driv.this, payment_driv.class);
+				startActivity(i);
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
+                Context context = getApplicationContext();
+                Toast.makeText(context, R.string.fail, LENGTH_LONG)
+                        .show();
                 error.printStackTrace();
             }
-        }) {
+        }){
             @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<String, String>();
-                params.put("id", value);
+            protected Map<String,String> getParams(){
+                Map<String,String> params = new HashMap<String, String>();
+                params.put("id",value);
                 return params;
             }
         };
-        rq.add(sr);
+        MyRequestQueue.add(MyStringRequest);
+        
     }
 }

@@ -58,6 +58,7 @@ public class Details extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.details);
+
         Toast.makeText(getApplicationContext(), R.string.poll, LENGTH_LONG)
                 .show();
         textViewName = (TextView) findViewById(R.id.textViewName);
