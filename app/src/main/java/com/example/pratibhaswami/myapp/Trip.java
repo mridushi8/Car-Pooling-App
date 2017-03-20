@@ -1,13 +1,10 @@
 package com.example.pratibhaswami.myapp;
 
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-
 import java.sql.Time;
 import java.util.Date;
-
 import android.graphics.Color;
 import android.location.Location;
 import android.net.Uri;
@@ -21,7 +18,6 @@ import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -46,12 +42,10 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-
 import static android.widget.Toast.LENGTH_LONG;
 
 /**
@@ -84,10 +78,8 @@ public class Trip extends FragmentActivity implements OnMapReadyCallback, Google
         //if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
           //  checkLocationPermission();
         //}
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
 
     }
@@ -96,12 +88,9 @@ public class Trip extends FragmentActivity implements OnMapReadyCallback, Google
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
-
         //Initialize Google Play Services
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ContextCompat.checkSelfPermission(this,
-                    android.Manifest.permission.ACCESS_FINE_LOCATION)
-                    == PackageManager.PERMISSION_GRANTED) {
+            if (ContextCompat.checkSelfPermission(this,android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 buildGoogleApiClient();
                 mMap.setMyLocationEnabled(true);
             }
@@ -246,18 +235,15 @@ public class Trip extends FragmentActivity implements OnMapReadyCallback, Google
         }
     }
 	
-	private void redrawLine(){
-
-    mMap.clear();  //clears all Markers and Polylines
-
+private void redrawLine(){
+    mMap.clear();  
     PolylineOptions options = new PolylineOptions().width(5).color(Color.BLUE).geodesic(true);
     for (int i = 0; i < points.size(); i++) {
         LatLng point = points.get(i);
         options.add(point);
     }
-
-		line = mMap.addPolyline(options); //add Polyline
-	}
+    line = mMap.addPolyline(options); //add Polyline
+}
 
     /**public void onSubmit(View view) {
         RequestQueue MyRequestQueue = Volley.newRequestQueue(getBaseContext());
