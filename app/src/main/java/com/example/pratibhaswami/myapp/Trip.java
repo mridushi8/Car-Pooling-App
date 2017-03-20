@@ -56,6 +56,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
 import java.util.Objects;
 
 import static android.widget.Toast.LENGTH_LONG;
@@ -91,12 +92,19 @@ public class Trip extends FragmentActivity implements OnMapReadyCallback, Google
         super.onCreate(savedInstanceState);
         setContentView(R.layout.trip);
         points = new ArrayList<LatLng>();
+
         handler = new Handler();
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         sharedpreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);	
 	    value = sharedpreferences.getString(Userid, "");
+
+        //if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+          //  checkLocationPermission();
+        //}
+
+
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
 
     }
@@ -105,12 +113,9 @@ public class Trip extends FragmentActivity implements OnMapReadyCallback, Google
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
-
         //Initialize Google Play Services
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ContextCompat.checkSelfPermission(this,
-                    android.Manifest.permission.ACCESS_FINE_LOCATION)
-                    == PackageManager.PERMISSION_GRANTED) {
+            if (ContextCompat.checkSelfPermission(this,android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 buildGoogleApiClient();
                 mMap.setMyLocationEnabled(true);
             }
@@ -259,6 +264,7 @@ public class Trip extends FragmentActivity implements OnMapReadyCallback, Google
         }
     }
 	
+
 	private void redrawLine(){
 
 		mMap.clear();
@@ -271,6 +277,8 @@ public class Trip extends FragmentActivity implements OnMapReadyCallback, Google
 
 		line = mMap.addPolyline(options); //add Polyline
 	}
+
+
 
     public void onSubmit(View view) {
         Context context = getApplicationContext();
@@ -335,4 +343,10 @@ public class Trip extends FragmentActivity implements OnMapReadyCallback, Google
         };
         rq.add(sr);
     }
+
 }
+
+
+
+
+
