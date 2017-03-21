@@ -2,6 +2,20 @@ package com.example.pratibhaswami.myapp;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.RatingBar;
+import android.widget.Toast;
+import android.widget.TextView;
+
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+
 public static final String MyPREFERENCES = "MyPref" ;
     public static final String Name = "nameKey";
     public static final String Userid = "idKey";
@@ -10,14 +24,16 @@ public static final String MyPREFERENCES = "MyPref" ;
 
 
 public class payment_pass extends AppCompatActivity {
+    
+    private static Button button_rate;
+    private static RatingBar rating_b;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_payment_pass);
         sharedpreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
-
-        
+        onButtonClickListener(); 
     }
      
     public void onButtonClickListener() {
