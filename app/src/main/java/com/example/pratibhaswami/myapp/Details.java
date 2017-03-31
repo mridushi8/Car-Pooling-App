@@ -38,25 +38,50 @@ import static android.widget.Toast.LENGTH_LONG;
 public class Details extends AppCompatActivity {
 	private GoogleApiClient client2;
 	String name, phone, value;
-	TextView textViewName, textViewPhone;
-	Button startJourney, cancelTrip;
+	TextView textViewName, textViewPhone,textViewCarNo;
+	Button accept, cancelTrip,startjourney;
 	public static final String Userid = "idKey";
 	public static final String MyPREFERENCES = "MyPref" ;
 	SharedPreferences sharedpreferences;
 	ProgressDialog loading;
     Handler handler = new Handler();
+	String flag="0";
+	String carno;
 
 
     protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.details);
 
-        Toast.makeText(getApplicationContext(), R.string.poll, LENGTH_LONG)
-                .show();
+
         textViewName = (TextView) findViewById(R.id.textViewName);
         textViewPhone = (TextView) findViewById(R.id.textViewPhone);
-		startJourney = (Button) findViewById(R.id.startButton);
+		textViewCarNo = (TextView) findViewById(R.id.textViewCarno);
+		accept = (Button) findViewById(R.id.accept);
+		startjourney = (Button) findViewById(R.id.startButton);
+		startjourney.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				Intent i=new Intent(Details.this,Trip.class);
+				startActivity(i);
+			}
+		});
+		accept.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				flag="1";
+				getStatus1();
+			}
+		});
 		cancelTrip = (Button) findViewById(R.id.cancelButton);
+		cancelTrip.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				flag="-1";
+				getStatus1();
+				cancelTrip(view);
+			}
+		});
 		sharedpreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
 		value = sharedpreferences.getString(Userid, "");
 		getStatus();
@@ -68,9 +93,9 @@ public class Details extends AppCompatActivity {
 
 
 public void getStatus() {
-	loading = ProgressDialog.show(this, "Fetching Driver Details", "Please wait..", false, false);
+	//loading = ProgressDialog.show(this, "Fetching Driver Details", "Please wait..", false, false);
 	RequestQueue rq = Volley.newRequestQueue(getBaseContext());
-	String url = "http://192.168.1.6:8000/api/status";
+	String url = "http://192.168.137.103:8000/status";
 	StringRequest sr = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() { 
 			@RequiresApi(api = Build.VERSION_CODES.KITKAT)
 			@Override
@@ -94,17 +119,44 @@ public void getStatus() {
 	rq.add(sr);
 }
 
+	public void getStatus1() {
+		//loading = ProgressDialog.show(this, "Fetching Driver Details", "Please wait..", false, false);
+		RequestQueue rq = Volley.newRequestQueue(getBaseContext());
+		String url = "http://192.168.137.103:8000/accept_driver";
+		StringRequest sr = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+			@RequiresApi(api = Build.VERSION_CODES.KITKAT)
+			@Override
+			public void onResponse(String rsp) {
+				//showJSON(rsp);
+			}
+		}, new Response.ErrorListener() {
+			@Override
+			public void onErrorResponse(VolleyError error) {
+				error.printStackTrace();
+			}
+		})
+		{
+			@Override
+			protected Map<String, String> getParams() {
+				Map<String, String> params = new HashMap<String, String>();
+				params.put("request_id", value);
+				params.put("flag", flag);
+				return params;
+			}
+		};
+		rq.add(sr);
+	}
+
+
 @RequiresApi(api = Build.VERSION_CODES.KITKAT)
 private void showJSON(String json) {
-	loading.dismiss();
+	//loading.dismiss();
 	try {
 		JSONObject reader = new JSONObject(json);
 		String status = reader.getString("status");
-            	if(Objects.equals(status, "202")) {           
-			name = reader.getString("name");
-			phone = reader.getString("phone_no");
-			textViewName.setText(name);
-			textViewPhone.setText(phone);
+            	if(Objects.equals(status, "202")) {
+					getDriver();
+
            	}
            	else{ 
 			handler.postDelayed(new Runnable() { 
@@ -138,14 +190,14 @@ public void onStop() {
 	client2.disconnect();
 }
 
-public void startJourney(View view){
+/*public void startJourney(View view){
 	Intent i = new Intent(Details.this, Trip.class);
 	startActivity(i);
-}
+}*/
 
 public void cancelTrip(View view){
 	RequestQueue rq = Volley.newRequestQueue(getBaseContext());
-        String url = "http://192.168.1.8:8000/api/complete";
+        String url = "http://192.168.137.103:8000/complete";
         StringRequest sr = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -168,6 +220,45 @@ public void cancelTrip(View view){
         };
         rq.add(sr);
 }
+
+	public void getDriver(){
+		RequestQueue rq = Volley.newRequestQueue(getBaseContext());
+		String url = "http://192.168.137.103:8000/get_driver";
+		StringRequest sr = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+			@Override
+			public void onResponse(String response) {
+				try{
+					JSONObject reader = new JSONObject(response);
+				name = reader.getString("name");
+					phone = reader.getString("phone");
+					carno = reader.getString("carno");
+
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+				textViewName.setText(name);
+				textViewPhone.setText(phone);
+				textViewCarNo.setText(carno);
+
+			}
+
+		}, new Response.ErrorListener() {
+			@Override
+			public void onErrorResponse(VolleyError error) {
+				error.printStackTrace();
+			}
+		}) {
+			@Override
+			protected Map<String, String> getParams() {
+				Map<String, String> params = new HashMap<String, String>();
+				params.put("id", value);
+				return params;
+			}
+		};
+		rq.add(sr);
+	}
+
+
 }
 
 

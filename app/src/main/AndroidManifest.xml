@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.pratibhaswami.myapp">
-<uses-permission android:name="android.permission.INTERNET" />
+
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission." />
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-
-
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <application
         android:name=".ExampleApplication"
@@ -17,8 +16,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <!--Add the following to your AndroidManifest.xml to prevent the launching of your main Activity
-        if you are calling startActivity above.-->
+        <!--
+        Add the following to your AndroidManifest.xml to prevent the launching of your main Activity
+        if you are calling startActivity above.
+        -->
         <meta-data
             android:name="com.onesignal.NotificationOpened.DEFAULT"
             android:value="DISABLE" />
@@ -40,9 +41,11 @@
         <activity android:name=".MainActivity1">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
@@ -65,19 +68,20 @@
         <activity
             android:name=".Trip"
             android:label="@string/title_activity_maps" />
+        <activity
+            android:name=".Trip_driv"
+            android:label="@string/title_activity_maps" />
 
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
-        <activity android:name=".MapActivity_driv" />
+        <activity android:name=".MapsActivity_driv" />
         <activity android:name=".upload_pass" />
-        <activity android:name=".upload_driv"></activity>
-
-
-
+        <activity android:name=".upload_driv" />
+        <activity android:name=".payment_pass" />
+        <activity android:name=".payment_driv" />
 
     </application>
-
 
 </manifest>

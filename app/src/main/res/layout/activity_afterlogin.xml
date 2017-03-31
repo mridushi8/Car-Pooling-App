@@ -13,7 +13,7 @@
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="48dp"
-            android:background="#13b586"
+            android:background="#ff33b5e5"
             android:orientation="horizontal"
             android:layout_alignParentTop="true">
 
@@ -105,7 +105,7 @@
                 android:text="Go!"
                 android:textColor="#fff"
                 android:textSize="13dp"
-                android:background="#13b586"/>
+                android:background="@drawable/round"/>
 
 
 

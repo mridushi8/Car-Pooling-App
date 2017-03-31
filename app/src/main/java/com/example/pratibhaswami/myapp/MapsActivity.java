@@ -8,13 +8,13 @@ import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.net.Uri;
-import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
-import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -38,27 +38,34 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import static android.widget.Toast.LENGTH_LONG;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
- 
+
     private GoogleMap mMap;
     PlaceAutocompleteFragment autocompleteFragment, autocompleteFragment1;
     private GoogleApiClient client;
     double sourcelat,sourcelog,destlat, destlog;
-    String origin, origins, dest, dests, value;
+    String source;
+    String destination;
+    String slat1,dlat1,dlong1,slong1;
     public static final String Userid = "idKey", MyPREFERENCES = "MyPref", TAG = "Bla";
     SharedPreferences sharedpreferences;
     TextView estfare,estfare1;
- 
+    String value;
+   // Button submit;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,13 +75,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
         estfare = (TextView) findViewById (R.id.estfare);
         estfare1 = (TextView) findViewById (R.id.estfare1);
- 
+
+
+
         autocompleteFragment =
                 (PlaceAutocompleteFragment) getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
- 
+
         autocompleteFragment1 =
                 (PlaceAutocompleteFragment) getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment1);
- 
+
         autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
             public void onPlaceSelected(Place place) {
@@ -87,6 +96,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         Address address = (Address) addressList.get(0);
                         sourcelat = address.getLatitude();
                         sourcelog = address.getLongitude();
+                        slat1=Double.toString(sourcelat);
+                        slong1=Double.toString(sourcelog);
                         LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
                         mMap.addMarker(new MarkerOptions().position(latLng).draggable(true).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
                         mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
@@ -94,19 +105,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                origin = (String) place.getName();
+                source = (String) place.getName();
 
             }
- 
+
             @Override
             public void onError(Status status) {
                 Log.i(TAG, "An error occurred: " + status);
             }
- 
- 
+
+
         });
- 
- 
+
+
         autocompleteFragment1.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
             public void onPlaceSelected(Place place) {
@@ -119,6 +130,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         Address address = (Address) addressList.get(0);
                         destlat = address.getLatitude();
                         destlog = address.getLongitude();
+                        dlat1=Double.toString(destlat);
+                        dlong1=Double.toString(destlog);
                         LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
                         mMap.addMarker(new MarkerOptions().position(latLng).draggable(true).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
                         mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
@@ -127,18 +140,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                dest = (String) place.getName();
+                destination = (String) place.getName();
 
 		getestfare();
             }
- 
+
             @Override
             public void onError(Status status) {
                 Log.i(TAG, "An error occurred: " + status);
             }
-		 
+
         });
-	sharedpreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);	
+	sharedpreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
 	value = sharedpreferences.getString(Userid, "");
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
@@ -181,11 +194,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     public void drawPath(String  result) {
-       
+
         LatLng from = new LatLng(sourcelat,sourcelog);
         LatLng to = new LatLng(destlat,destlog);
         try {
-            
+
             final JSONObject json = new JSONObject(result);
             JSONArray routeArray = json.getJSONArray("routes");
             JSONObject routes = routeArray.getJSONObject(0);
@@ -239,18 +252,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         return poly;
     }
- 
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
- 
+
         LatLng Delhi = new LatLng(28.614055, 77.211033);
         mMap.addMarker(new MarkerOptions().position(Delhi).draggable(true));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(Delhi));
         mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
     }
- 
-    public void onClick(View view) {
+
+   public void onClick(View view) {
 		sendDetails();
     }
 
@@ -263,56 +276,58 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .setActionStatus(Action.STATUS_TYPE_COMPLETED)
                 .build();
     }
- 
+
     @Override
     public void onStart() {
         super.onStart();
         client.connect();
         AppIndex.AppIndexApi.start(client, getIndexApiAction());
     }
- 
+
     @Override
     public void onStop() {
         super.onStop();
         AppIndex.AppIndexApi.end(client, getIndexApiAction());
         client.disconnect();
     }
-    
-	
-	public void sendDetails(){
-		RequestQueue MyRequestQueue = Volley.newRequestQueue(getBaseContext());
-		String url = "http://192.168.1.8:8000/api/request";
-		StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
-		    @Override
-		    public void onResponse(String response) {
-			Intent i = new Intent(MapsActivity.this, Details.class);
-			startActivity(i);
-		    }
-		}, new Response.ErrorListener() {
-		    @Override
-		    public void onErrorResponse(VolleyError error) {
-			Context context = getApplicationContext();
-			Toast.makeText(context, R.string.fail, LENGTH_LONG)
-				.show();
-			error.printStackTrace();
-		    }
-		}){
-			@Override
-		    protected Map<String,String> getParams(){
-			Map<String,String> params = new HashMap<String, String>();
-			params.put("id",value);
-			params.put("ts","1");
-			params.put("slat", String.valueOf(sourcelat));
-			params.put("slong", String.valueOf(sourcelog));
-		        params.put("dlat", String.valueOf(destlat));
-		        params.put("dlong", String.valueOf(destlog));
-			return params;
-		    }
-		};
-		MyRequestQueue.add(MyStringRequest);
 
-	}
-	
+
+    public void sendDetails(){
+        RequestQueue MyRequestQueue = Volley.newRequestQueue(getBaseContext());
+        String url = "http://192.168.137.103:8000/passenger_request";
+        StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Intent i = new Intent(MapsActivity.this, Details.class);
+                startActivity(i);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Intent i = new Intent(MapsActivity.this, Details.class);
+                startActivity(i);
+                Context context = getApplicationContext();
+                Toast.makeText(context, "fail" , LENGTH_LONG)
+                        .show();
+                error.printStackTrace();
+            }
+        }){
+            @Override
+            protected Map<String,String> getParams(){
+                Map<String,String> params = new HashMap<String, String>();
+                params.put("id",value);
+                params.put("ts","1");
+                params.put("slat1", slat1);
+                params.put("slong1", slong1);
+                params.put("dlat1", dlat1);
+                params.put("dlong1", dlong1);
+                return params;
+            }
+
+        };
+        MyRequestQueue.add(MyStringRequest);
+    }
+
 	public String makeURL1 (double lat, double log){
 		StringBuilder urlString = new StringBuilder();
 		urlString.append(Double.toString(lat));
@@ -322,11 +337,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 	    }
 
-    public void getestfare(){
-	origins = makeURL1(sourcelat, sourcelog);
-        dests = makeURL1(destlat, destlog);
+   public void getestfare(){
+	source = makeURL1(sourcelat, sourcelog);
+        destination = makeURL1(destlat, destlog);
         RequestQueue MyRequestQueue = Volley.newRequestQueue(getBaseContext());
-        String url = "http://192.168.1.8:8000/api/estimatefare";
+        String url = "http://192.168.137.103:8000/estimatefare";
         StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -343,13 +358,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             protected Map<String,String> getParams(){
                 Map<String,String> params = new HashMap<String, String>();
 
-                params.put("origin", origins);
-                params.put("dest", dests);
+                params.put("origin", source);
+                params.put("dest", destination);
                 return params;
             }
         };
         MyRequestQueue.add(MyStringRequest);
 	}
-	
+
 }
 

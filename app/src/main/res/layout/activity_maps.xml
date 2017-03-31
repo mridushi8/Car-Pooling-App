@@ -36,7 +36,8 @@
             android:text="Submit"
             android:id="@+id/Bsearch"
             android:layout_gravity="right"
-            android:onClick="onClick" />
+            android:onClick="onClick"
+			android:background="#13b586"/>
 	</LinearLayout>
 	<LinearLayout
         android:layout_width="wrap_content"

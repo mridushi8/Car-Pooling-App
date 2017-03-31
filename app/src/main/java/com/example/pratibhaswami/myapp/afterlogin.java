@@ -65,11 +65,11 @@ public class afterlogin extends AppCompatActivity {
                 if (selectedrb.getText().equals("Driver"))
                 {  if(sharedpreferences.contains("driv"))
                 {
-                    Intent i = new Intent(afterlogin.this, MapActivity_driv.class);
+                    Intent i = new Intent(afterlogin.this, MapsActivity_driv.class);
                     startActivity(i); }
 
                 else {
-                    Intent i = new Intent(afterlogin.this, MapActivity_driv.class);
+                    Intent i = new Intent(afterlogin.this, MapsActivity_driv.class);
                     startActivity(i);
                 }
                 }

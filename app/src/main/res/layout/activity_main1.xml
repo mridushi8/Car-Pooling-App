@@ -6,37 +6,53 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="New Text"
-        android:id="@+id/name" />
+        android:id="@+id/name"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="40sp" />
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="New Text"
-        android:id="@+id/timestamp" />
+        android:id="@+id/timestamp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="20sp" />
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="New Text"
-        android:id="@+id/destination" />
+        android:id="@+id/destination"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="20sp" />
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="New Text"
-        android:id="@+id/source" />
+        android:id="@+id/source"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="20sp"/>
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="New Text"
-        android:id="@+id/phone_no" />
+        android:id="@+id/phone_no"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="20sp"
+        android:layout_marginBottom="20sp" />
     <Button
         android:layout_below="@id/phone_no"
         android:id="@+id/accept"
         android:text="accept"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_width="138dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/round"
+        android:layout_gravity="center_horizontal" />
     <Button
         android:layout_below="@id/accept"
         android:id="@+id/reject"
         android:text="reject"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_width="135dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/round"
+        android:layout_marginTop="10sp"
+        android:layout_gravity="center_horizontal" />
    </LinearLayout>

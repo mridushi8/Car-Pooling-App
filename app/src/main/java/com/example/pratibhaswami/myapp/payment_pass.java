@@ -1,52 +1,108 @@
 package com.example.pratibhaswami.myapp;
 
+
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RatingBar;
-import android.widget.Toast;
 import android.widget.TextView;
-
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-
-public static final String MyPREFERENCES = "MyPref" ;
-    public static final String Name = "nameKey";
-    public static final String Userid = "idKey";
-    SharedPreferences sharedpreferences;
-
-
-
+import org.json.JSONException;
+import org.json.JSONObject;
+import java.util.HashMap;
+import java.util.Map;
 public class payment_pass extends AppCompatActivity {
-    
+
+    public static final String Name = "nameKey";
+
+    SharedPreferences sharedpreferences;
+    public static final String Userid = "idKey";
+    public static final String MyPREFERENCES = "MyPref" ;
+
     private static Button button_rate;
     private static RatingBar rating_b;
 
+    String distance,startTime, value;
+    String actual_fare;
+    private Button end;
+    TextView actual_fare1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_payment_pass);
+        Intent intent = getIntent();
+        distance=intent.getStringExtra("distance");
+        startTime=intent.getStringExtra("startTime");
+        actual_fare1=(TextView)findViewById(R.id.textView);
+        button_rate  = (Button) findViewById(R.id.button);
+        rating_b  = (RatingBar) findViewById(R.id.ratingBar);
+        end=(Button)findViewById(R.id.end);
+
         sharedpreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
-        onButtonClickListener(); 
+        value = sharedpreferences.getString(Userid, "");
+        getStatus();
+        onButtonClickListener();
+        end.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                RequestQueue rq = Volley.newRequestQueue(getBaseContext());
+                String url = "http://192.168.137.103:8000/paid";
+                StringRequest sr = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+
+                    @Override
+                    public void onResponse(String rsp) {
+                        if(rsp.equals("True"))
+                        {
+                            Intent i = new Intent(payment_pass.this, afterlogin.class);
+                            startActivity(i);
+                        }
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        error.printStackTrace();
+                    }
+                }) {
+                    @Override
+                    protected Map<String, String> getParams() {
+                        Map<String, String> params = new HashMap<String, String>();
+                        String value = sharedpreferences.getString(Userid, "");
+
+                        params.put("id",value);
+                        return params;
+                    }
+                };
+                rq.add(sr);
+
+            }
+        });
     }
-     
+    @Override
+    public void onBackPressed() { }
+
+
     public void onButtonClickListener() {
-        rating_b = (RatingBar) findViewById(R.id.ratingBar);
-        button_rate = (Button) findViewById(R.id.button);
+
 
         button_rate.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         RequestQueue queue = Volley.newRequestQueue(getBaseContext());
-                        String value = sharedpreferences.getString(Userid, "");
-                        String url = "http://localhost:8000/api/request/?rating=" + String.valueOf(rating_b.getRating()) + "&userid=" + value;
+                        final String value = sharedpreferences.getString(Userid, "");
+                        String url ="http://192.168.137.103:8000/rating=";
 
                         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                                 new Response.Listener<String>() {
@@ -57,10 +113,18 @@ public class payment_pass extends AppCompatActivity {
                             @Override
                             public void onErrorResponse(VolleyError error) {
 
-                                error.printStackTrace();
+                                //error.printStackTrace();
 
                             }
-                        });
+                        }){
+                            @Override
+                            protected Map<String, String> getParams() {
+                                Map<String, String> params = new HashMap<String, String>();
+                                params.put("rating", String.valueOf(rating_b.getRating()));
+                                params.put("userid", value);
+                                return params;
+                            }
+                        };
 // Add the request to the RequestQueue.
                         queue.add(stringRequest);
 
@@ -68,5 +132,48 @@ public class payment_pass extends AppCompatActivity {
 
 
                 });
+    }
+
+    public void getStatus() {
+        RequestQueue rq = Volley.newRequestQueue(getBaseContext());
+        String url = "http://192.168.137.103:8000/actualfare";
+        StringRequest sr = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+
+            @Override
+            public void onResponse(String rsp) {
+                try {
+                    showJSON(rsp);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                error.printStackTrace();
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("distance",distance );
+                params.put("startTime",startTime );
+                return params;
+            }
+        };
+        rq.add(sr);
+    }
+
+    private void showJSON(String json) throws JSONException {
+
+        JSONObject reader = new JSONObject(json);
+        actual_fare = reader.getString("actual_fare");
+        actual_fare1.setText(actual_fare);
+
+
+
+
+
+
     }
 }

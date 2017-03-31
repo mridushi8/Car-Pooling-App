@@ -16,19 +16,13 @@
 
         <Button
             style="?android:attr/buttonStyleSmall"
-            android:layout_width="wrap_content"
+            android:layout_width="158dp"
             android:layout_height="wrap_content"
             android:text="Reached Dest"
             android:id="@+id/Bsearch"
-            android:onClick="onSubmit" />
-        <Button
-            style="?android:attr/buttonStyleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Payment"
-            android:id="@+id/payment"
-
-            android:onClick="onPaym" />
+            android:onClick="onSubmit"
+            android:shadowColor="#13b2b5"
+            android:background="@drawable/round" />
     </LinearLayout>
 
        <LinearLayout

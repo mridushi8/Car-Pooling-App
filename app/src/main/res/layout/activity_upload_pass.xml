@@ -11,7 +11,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Upload Identity Proof"
-        android:id="@+id/buttonChoose" />
+        android:id="@+id/buttonChoose"
+        android:background="@drawable/round"/>
 
 
     <ImageView
@@ -25,7 +26,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Upload Image"
-        android:id="@+id/buttonUpload" />
+        android:id="@+id/buttonUpload"
+        android:background="@drawable/round"/>
 
 
 </LinearLayout>

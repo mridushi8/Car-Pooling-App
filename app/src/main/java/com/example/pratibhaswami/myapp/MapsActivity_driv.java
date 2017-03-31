@@ -1,5 +1,9 @@
 package com.example.pratibhaswami.myapp;
 
+/**
+ * Created by pratibhaswami on 25/03/17.
+ */
+
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -34,7 +38,6 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
@@ -52,23 +55,29 @@ import java.util.Map;
 
 import static android.widget.Toast.LENGTH_LONG;
 
-public class MapActivity_driv extends FragmentActivity implements OnMapReadyCallback {
+
+
+
+public class MapsActivity_driv extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private static final String TAG = "Bla";
     PlaceAutocompleteFragment autocompleteFragment;
     PlaceAutocompleteFragment autocompleteFragment1;
     private GoogleApiClient client;
-    public static final String Userid = "idKey";
-    public static final String MyPREFERENCES = "MyPref" ;
-    SharedPreferences sharedpreferences;
     double sourcelat;
     double sourcelog;
     double destlat;
     double destlog;
+    String source;
+    String destination;
+    String slat1,dlat1,dlong1,slong1;
+
+    public static final String Userid = "idKey";
+    public static final String MyPREFERENCES = "MyPref" ;
+    SharedPreferences sharedpreferences;
     String value;
-    String origin, origins;
-    String dest, dests;
+
 
     @RequiresApi(api = Build.VERSION_CODES.HONEYCOMB)
     @Override
@@ -98,14 +107,16 @@ public class MapActivity_driv extends FragmentActivity implements OnMapReadyCall
                         Address address = (Address) addressList.get(0);
                         sourcelat = address.getLatitude();
                         sourcelog = address.getLongitude();
+                        slat1=Double.toString(sourcelat);
+                        slong1=Double.toString(sourcelog);
                         LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
-                        mMap.addMarker(new MarkerOptions().position(latLng).draggable(true).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+                        mMap.addMarker(new MarkerOptions().position(latLng).draggable(true));
                         mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                origin = (String) place.getName();
+                source = (String) place.getName();
 
             }
 
@@ -131,18 +142,17 @@ public class MapActivity_driv extends FragmentActivity implements OnMapReadyCall
                         Address address = (Address) addressList.get(0);
                         destlat = address.getLatitude();
                         destlog = address.getLongitude();
+                        dlat1=Double.toString(destlat);
+                        dlong1=Double.toString(destlog);
                         LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
-                        mMap.addMarker(new MarkerOptions().position(latLng).draggable(true).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
+                        mMap.addMarker(new MarkerOptions().position(latLng).draggable(true));
                         mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
-
                         getDirection();
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                dest = (String) place.getName();
-
-
+                destination = (String) place.getName();
             }
 
             @Override
@@ -156,20 +166,22 @@ public class MapActivity_driv extends FragmentActivity implements OnMapReadyCall
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 
-
-
-
-
-
-
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
-
-        LatLng Delhi = new LatLng(28.614055, 77.211033);
-        mMap.addMarker(new MarkerOptions().position(Delhi).draggable(true));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(Delhi));
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
+    public String makeURL (double sourcelat, double sourcelog, double destlat, double destlog ){
+        StringBuilder urlString = new StringBuilder();
+        urlString.append("https://maps.googleapis.com/maps/api/directions/json");
+        urlString.append("?origin=");// from
+        urlString.append(Double.toString(sourcelat));
+        urlString.append(",");
+        urlString
+                .append(Double.toString( sourcelog));
+        urlString.append("&destination=");// to
+        urlString
+                .append(Double.toString( destlat));
+        urlString.append(",");
+        urlString.append(Double.toString(destlog));
+        urlString.append("&sensor=false&mode=driving&alternatives=true");
+        urlString.append("&key=AIzaSyBb8sOnnrIVDsq9dutdLve2Hf5esERl1gA");
+        return urlString.toString();
     }
 
     private void getDirection(){
@@ -216,7 +228,7 @@ public class MapActivity_driv extends FragmentActivity implements OnMapReadyCall
             Polyline line = mMap.addPolyline(new PolylineOptions()
                     .addAll(list)
                     .width(10)
-                    .color(Color.BLUE)
+                    .color(Color.RED)
                     .geodesic(true)
             );
 
@@ -226,24 +238,6 @@ public class MapActivity_driv extends FragmentActivity implements OnMapReadyCall
 
 
         }
-    }
-
-    public String makeURL (double sourcelat, double sourcelog, double destlat, double destlog ){
-        StringBuilder urlString = new StringBuilder();
-        urlString.append("https://maps.googleapis.com/maps/api/directions/json");
-        urlString.append("?origin=");// from
-        urlString.append(Double.toString(sourcelat));
-        urlString.append(",");
-        urlString
-                .append(Double.toString( sourcelog));
-        urlString.append("&destination=");// to
-        urlString
-                .append(Double.toString( destlat));
-        urlString.append(",");
-        urlString.append(Double.toString(destlog));
-        urlString.append("&sensor=false&mode=driving&alternatives=true");
-        urlString.append("&key=AIzaSyBb8sOnnrIVDsq9dutdLve2Hf5esERl1gA");
-        return urlString.toString();
     }
 
     private List<LatLng> decodePoly(String encoded) {
@@ -279,41 +273,18 @@ public class MapActivity_driv extends FragmentActivity implements OnMapReadyCall
         return poly;
     }
 
-    public void onClick(View view) {
-        sendDetails();
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+
+        LatLng Delhi = new LatLng(28.614055, 77.211033);
+        mMap.addMarker(new MarkerOptions().position(Delhi).draggable(true));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(Delhi));
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
     }
 
-    public void sendDetails(){
-        RequestQueue MyRequestQueue = Volley.newRequestQueue(getBaseContext());
-        String url = "http://192.168.1.8:8000/driver_request";
-        StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                Intent i = new Intent(MapActivity_driv.this, MainActivity3.class);
-                startActivity(i);
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Context context = getApplicationContext();
-                Toast.makeText(context, R.string.fail, LENGTH_LONG)
-                        .show();
-                error.printStackTrace();
-            }
-        }){
-            @Override
-            protected Map<String,String> getParams(){
-                Map<String,String> params = new HashMap<String, String>();
-                params.put("id",value);
-                params.put("ts","1");
-                params.put("slat", String.valueOf(sourcelat));
-                params.put("slong", String.valueOf(sourcelog));
-                params.put("dlat", String.valueOf(destlat));
-                params.put("dlong", String.valueOf(destlog));
-                return params;
-            }
-        };
-        MyRequestQueue.add(MyStringRequest);
+    public void onClick(View view) {
+        sendDetails();
 
     }
 
@@ -340,4 +311,41 @@ public class MapActivity_driv extends FragmentActivity implements OnMapReadyCall
         AppIndex.AppIndexApi.end(client, getIndexApiAction());
         client.disconnect();
     }
+
+
+    public void sendDetails(){
+        RequestQueue MyRequestQueue = Volley.newRequestQueue(getBaseContext());
+        String url = "http://192.168.137.103:8000/driver_request";
+        StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Intent i = new Intent(MapsActivity_driv.this, MainActivity3.class);
+                startActivity(i);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Context context = getApplicationContext();
+                Toast.makeText(context, "fail" , LENGTH_LONG)
+                        .show();
+                error.printStackTrace();
+            }
+        }){
+            @Override
+            protected Map<String,String> getParams(){
+                Map<String,String> params = new HashMap<String, String>();
+                params.put("id",value);
+                params.put("ts","1");
+                params.put("source", source);
+                params.put("destination", destination);
+                params.put("slat1", slat1);
+                params.put("slong1", slong1);
+                params.put("dlat1", dlat1);
+                params.put("dlong1", dlong1);
+                return params;
+            }
+        };
+        MyRequestQueue.add(MyStringRequest);
+    }
+
 }

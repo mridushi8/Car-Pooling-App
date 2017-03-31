@@ -4,31 +4,55 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Fetching Driver Details"
         android:id="@+id/textViewName"
         android:layout_gravity="center_horizontal|center_vertical"
-        android:textColor="#ffffff"
+        android:textColor="@color/place_autocomplete_prediction_secondary_text"
         android:layout_marginLeft="25dp"
         android:textSize="18sp"
         android:textStyle="bold"
-        android:layout_marginTop="16dp"/>
+        android:layout_marginTop="40sp"/>
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Fetching Driver Details"
         android:id="@+id/textViewPhone"
         android:layout_gravity="center_horizontal|center_vertical"
-        android:textColor="#ffffff"
+        android:textColor="@color/place_autocomplete_prediction_secondary_text"
         android:layout_marginLeft="25dp"
         android:textSize="18sp"
         android:textStyle="bold"
-        android:layout_marginTop="16dp"/>
+        android:layout_marginTop="20sp"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Fetching Driver Details"
+        android:id="@+id/textViewCarno"
+        android:layout_gravity="center_horizontal"
+        android:textColor="@color/place_autocomplete_prediction_secondary_text"
+        android:layout_marginLeft="25dp"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_marginTop="20sp"/>
     <Button
 
-        android:text="Start Journey"
+        android:text="Accept"
+        android:onClick="startJourney"
+        android:id="@+id/accept"
+        android:layout_width="190dp"
+        android:layout_height="38dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="16dp"
+        android:textColor="#fff"
+        android:textSize="13dp"
+        android:background="@drawable/round"/>
+    <Button
+
+        android:text="startButton"
         android:onClick="startJourney"
         android:id="@+id/startButton"
         android:layout_width="190dp"
@@ -37,7 +61,7 @@
         android:layout_marginTop="16dp"
         android:textColor="#fff"
         android:textSize="13dp"
-        android:background="#13b586"/>
+        android:background="@drawable/round"/>
     <Button
 
         android:text="Cancel Trip"
@@ -49,7 +73,7 @@
         android:layout_marginTop="16dp"
         android:textColor="#fff"
         android:textSize="13dp"
-        android:background="#13b586"/>
+        android:background="@drawable/round"/>
  
 
 </LinearLayout>

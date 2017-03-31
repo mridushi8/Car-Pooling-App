@@ -1,7 +1,9 @@
 package com.example.pratibhaswami.myapp;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -48,7 +50,9 @@ public class MainActivity1 extends AppCompatActivity {
     String passenger_id;
     String lat_source;
     String long_source;
-
+    public static final String Userid = "idKey", MyPREFERENCES = "MyPref";
+    SharedPreferences sharedpreferences;
+    String value;
     ArrayList<HashMap<String, String>> contactList;
 
     @Override
@@ -56,6 +60,8 @@ public class MainActivity1 extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main1);
         Intent intent = getIntent();
+        sharedpreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
+        value = sharedpreferences.getString(Userid, "");
         passenger_id = intent.getStringExtra("passenger_id");
         Log.d("Passenger id",passenger_id);
 
@@ -66,19 +72,18 @@ public class MainActivity1 extends AppCompatActivity {
         destination1=(TextView)findViewById(R.id.destination);
         source1=(TextView)findViewById(R.id.source);
         phone_no1 = (TextView)findViewById(R.id.phone_no);
-
+        Log.d("before","3");
         accept=(Button)findViewById(R.id.accept);
-            accept.setOnClickListener(new View.OnClickListener() {
+        Log.d("after","3");
+           /** accept.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    Log.d("b4","intent");
                     Intent intent=new Intent(MainActivity1.this,MainActivity2.class);
-                   // intent.putExtra("lat_source", lat_source);
-                    //intent.putExtra("long_source", long_source);
                     intent.putExtra("passenger_id", passenger_id);
                     startActivity(intent);
-
                 }
-            });
+            });**/
             reject=(Button)findViewById(R.id.reject);
             reject.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -86,14 +91,23 @@ public class MainActivity1 extends AppCompatActivity {
 
                 }
             });
+        accept.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent=new Intent(MainActivity1.this,MainActivity2.class);
+                intent.putExtra("passenger_id", passenger_id);
+                startActivity(intent);
+                getStatus1();
+            }
+        });
 
         getStatus();
     }
 
     public void getStatus() {
-        loading = ProgressDialog.show(this, "Fetching Driver Details", "Please wait..", false, false);
+      //  loading = ProgressDialog.show(this, "Fetching Driver Details", "Please wait..", false, false);
         RequestQueue rq = Volley.newRequestQueue(getBaseContext());
-        String url = "http://192.168.1.8:8000/api/get_passenger";
+        String url = "http://192.168.137.103:8000/get_passenger";
         StringRequest sr = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
 
             @Override
@@ -124,7 +138,7 @@ public class MainActivity1 extends AppCompatActivity {
 
         JSONObject reader = new JSONObject(json);
         // String status = reader.getString("status");
-        loading.dismiss();
+       // loading.dismiss();
         name = reader.getString("name");
         timestamp = reader.getString("timestamp");
        // destination = reader.getString("destination");
@@ -144,4 +158,35 @@ public class MainActivity1 extends AppCompatActivity {
 
 
     }
+    public void getStatus1() {
+        loading = ProgressDialog.show(this, "Fetching Driver Details", "Please wait..", false, false);
+        RequestQueue rq = Volley.newRequestQueue(getBaseContext());
+        String url = "http://192.168.137.103:8000/driver_response";
+        StringRequest sr = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+
+            @Override
+            public void onResponse(String rsp) {
+                try {
+                    showJSON(rsp);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                error.printStackTrace();
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("id",value );
+                params.put("request_id",passenger_id);
+                return params;
+            }
+        };
+        rq.add(sr);
+    }
+
 }

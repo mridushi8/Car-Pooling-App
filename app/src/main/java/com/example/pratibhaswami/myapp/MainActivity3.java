@@ -35,12 +35,12 @@ public class MainActivity3 extends AppCompatActivity {
         OneSignal.idsAvailable(new OneSignal.IdsAvailableHandler() {
             @Override
             public void idsAvailable(String userId, String registrationId) {
-                text = "OneSignal UserID:\n" + userId + "\n\n";
+                text = userId;
 
-                if (registrationId != null)
+               /** if (registrationId != null)
                     text += "Google Registration Id:\n" + registrationId;
                 else
-                    text += "Google Registration Id:\nCould not subscribe for push";
+                    text += "Google Registration Id:\nCould not subscribe for push";**/
 
                 TextView textView = (TextView)findViewById(R.id.debug_view);
                 textView.setText(text);
@@ -54,7 +54,7 @@ public class MainActivity3 extends AppCompatActivity {
     public void getStatus() {
         //loading = ProgressDialog.show(this, "Fetching Driver Details", "Please wait..", false, false);
         RequestQueue rq = Volley.newRequestQueue(getBaseContext());
-        String url = "http://192.168.43.175:8000/player_id";
+        String url = "http://192.168.137.103:8000/player_id";
         StringRequest sr = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
 
             @Override

@@ -5,18 +5,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import java.sql.Time;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 import android.graphics.Color;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
@@ -24,20 +18,15 @@ import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
+
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.appindexing.Thing;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -49,17 +38,10 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
-import java.util.Objects;
-
-import static android.widget.Toast.LENGTH_LONG;
 
 /**
  * Created by ARATI on 2/11/2017.
@@ -79,13 +61,13 @@ public class Trip extends FragmentActivity implements OnMapReadyCallback, Google
     Polyline line;
     float distanceTillNow = 0;
     TextView dist, dist1, dist2;
-	public static final String Userid = "idKey";
-	public static final String MyPREFERENCES = "MyPref" ;
-	SharedPreferences sharedpreferences;
-	String value;
+    public static final String Userid = "idKey";
+    public static final String MyPREFERENCES = "MyPref" ;
+    SharedPreferences sharedpreferences;
+    String value;
     Handler handler;
     ProgressDialog loading;
-    String timeStamp = new SimpleDateFormat("MMM dd YYYY HH:mm").format(Calendar.getInstance().getTime());
+    String timeStamp = new SimpleDateFormat("MMM dd yyyy HH:mm").format(Calendar.getInstance().getTime()).toString();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,11 +79,11 @@ public class Trip extends FragmentActivity implements OnMapReadyCallback, Google
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-        sharedpreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);	
-	    value = sharedpreferences.getString(Userid, "");
+        sharedpreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
+        value = sharedpreferences.getString(Userid, "");
 
         //if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-          //  checkLocationPermission();
+        //  checkLocationPermission();
         //}
 
 
@@ -114,8 +96,8 @@ public class Trip extends FragmentActivity implements OnMapReadyCallback, Google
         mMap = googleMap;
         mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
         //Initialize Google Play Services
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ContextCompat.checkSelfPermission(this,android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 buildGoogleApiClient();
                 mMap.setMyLocationEnabled(true);
             }
@@ -157,11 +139,12 @@ public class Trip extends FragmentActivity implements OnMapReadyCallback, Google
 
     @Override
     public void onLocationChanged(Location location) {
-		float distance = location.distanceTo(mCurrentLocation);
-        distanceTillNow = distanceTillNow + distance;
         mCurrentLocation = location;
+        float distance = location.distanceTo(mCurrentLocation);
+        distanceTillNow = distanceTillNow + distance;
+
         mLastUpdateTime = new Date();
-        
+
         if (mCurrLocationMarker != null) {
             mCurrLocationMarker.remove();
         }
@@ -263,87 +246,120 @@ public class Trip extends FragmentActivity implements OnMapReadyCallback, Google
             // You can add here other case statements according to your requirement.
         }
     }
-	
 
-	private void redrawLine(){
 
-		mMap.clear();
+    private void redrawLine(){
 
-		PolylineOptions options = new PolylineOptions().width(5).color(Color.BLUE).geodesic(true);
-		for (int i = 0; i < points.size(); i++) {
-			LatLng point = points.get(i);
-			options.add(point);
-		}
+        mMap.clear();
 
-		line = mMap.addPolyline(options); //add Polyline
-	}
+        PolylineOptions options = new PolylineOptions().width(5).color(Color.BLUE).geodesic(true);
+        for (int i = 0; i < points.size(); i++) {
+            LatLng point = points.get(i);
+            options.add(point);
+        }
+
+        line = mMap.addPolyline(options); //add Polyline
+    }
 
 
 
     public void onSubmit(View view) {
-        Context context = getApplicationContext();
-        Toast.makeText(context, "Make Payment!", LENGTH_LONG).show();
+        Intent i = new Intent(Trip.this, payment_pass.class);
+        startActivity(i);
 
     }
 
-    public void onPaym(View view) {
-		
-		getStatus();
-        
+
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    /**private void showJSON(String json) {
+     loading.dismiss();
+     try {
+     JSONObject reader = new JSONObject(json);
+     String status = reader.getString("status");
+     if(Objects.equals(status, "404")){
+     //Intent i = new Intent(MapsActivity.this, payment_pass.class);
+     // i.putExtra("distance", distanceTillNow);
+     //i.putExtra("startTime", timeStamp);
+     //startActivity(i);
+     }
+     else{
+     handler.postDelayed(new Runnable() {
+    @Override
+    public void run() {
+    getStatus();
     }
-	
-	@RequiresApi(api = Build.VERSION_CODES.KITKAT)
-	private void showJSON(String json) {
-		loading.dismiss();
-		try {
-			JSONObject reader = new JSONObject(json);
-			String status = reader.getString("status");
-            if(Objects.equals(status, "404")){
-                Intent i = new Intent(Trip.this, payment_pass.class);
-                i.putExtra("distance", distanceTillNow);
-                i.putExtra("startTime", timeStamp);
-				startActivity(i);
-            }
-            else{
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        getStatus();
-                    }
-                }, 2000);
-            }
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-	}
+    }, 2000);
+     }
+     } catch (JSONException e) {
+     e.printStackTrace();
+     }
+     }**/
 
-    public void getStatus(){
-        loading = ProgressDialog.show(this, "Redirecting", "Please wait..", false, false);
-        RequestQueue rq = Volley.newRequestQueue(getBaseContext());
-        String url = "http://192.168.1.6:8000/api/status";
-        StringRequest sr = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+    /** public void getStatus(){
+     loading = ProgressDialog.show(this, "Redirecting", "Please wait..", false, false);
+     RequestQueue rq = Volley.newRequestQueue(getBaseContext());
+     String url = "http://192.168.137.103:8000/status";
+     StringRequest sr = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
 
-            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-            @Override
-            public void onResponse(String rsp) {
-                showJSON(rsp);
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                error.printStackTrace();
-            }
-        }) {
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<String, String>();
-                params.put("id", value);
-                return params;
-            }
-        };
-        rq.add(sr);
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    @Override
+    public void onResponse(String rsp) {
+    showJSON(rsp);
+    }
+    }, new Response.ErrorListener() {
+    @Override
+    public void onErrorResponse(VolleyError error) {
+    error.printStackTrace();
+    }
+    }) {
+    @Override
+    protected Map<String, String> getParams() {
+    Map<String, String> params = new HashMap<String, String>();
+    params.put("id", value);
+    return params;
+    }
+    };
+     rq.add(sr);
+     }**/
+
+    /**
+     * ATTENTION: This was auto-generated to implement the App Indexing API.
+     * See https://g.co/AppIndexing/AndroidStudio for more information.
+     */
+    public Action getIndexApiAction() {
+        Thing object = new Thing.Builder()
+                .setName("Maps Page") // TODO: Define a title for the content shown.
+                // TODO: Make sure this auto-generated URL is correct.
+                .setUrl(Uri.parse("http://[ENTER-YOUR-URL-HERE]"))
+                .build();
+        return new Action.Builder(Action.TYPE_VIEW)
+                .setObject(object)
+                .setActionStatus(Action.STATUS_TYPE_COMPLETED)
+                .build();
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client.connect();
+        AppIndex.AppIndexApi.start(client, getIndexApiAction());
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+       // AppIndex.AppIndexApi.end(client, getIndexApiAction());
+        client.disconnect();
+    }
 }
 
 

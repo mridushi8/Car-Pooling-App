@@ -1,39 +1,29 @@
 package com.example.pratibhaswami.myapp;
 
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import java.sql.Time;
-import java.util.Date;
 import android.graphics.Color;
 import android.location.Location;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
-import com.google.android.gms.appindexing.Action;
+
 import com.google.android.gms.appindexing.AppIndex;
-import com.google.android.gms.appindexing.Thing;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -44,12 +34,11 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
-import static android.widget.Toast.LENGTH_LONG;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Created by ARATI on 2/11/2017.
@@ -69,25 +58,29 @@ public class Trip_driv extends FragmentActivity implements OnMapReadyCallback, G
     Polyline line;
     float distanceTillNow = 0;
     TextView dist, dist1, dist2;
-	public static final String Userid = "idKey";
-	public static final String MyPREFERENCES = "MyPref" ;
-	SharedPreferences sharedpreferences;
-	String value;
+    public static final String Userid = "idKey";
+    public static final String MyPREFERENCES = "MyPref" ;
+    SharedPreferences sharedpreferences;
+    String value;
+
+    Handler handler;
+    ProgressDialog loading;
+    String timeStamp = new SimpleDateFormat("MMM dd yyyy HH:mm").format(Calendar.getInstance().getTime()).toString();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.trip);
+        setContentView(R.layout.trip_div);
 
         points = new ArrayList<LatLng>();
         //if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-          //  checkLocationPermission();
+        //  checkLocationPermission();
         //}
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-        sharedpreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);	
-	    value = sharedpreferences.getString(Userid, "");
+        sharedpreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
+        value = sharedpreferences.getString(Userid, "");
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
 
     }
@@ -143,9 +136,10 @@ public class Trip_driv extends FragmentActivity implements OnMapReadyCallback, G
 
     @Override
     public void onLocationChanged(Location location) {
+        mCurrentLocation = location;
         float distance = location.distanceTo(mCurrentLocation);
         distanceTillNow = distanceTillNow + distance;
-        mCurrentLocation = location;
+
         mLastUpdateTime = new Date();
         if (mCurrLocationMarker != null) {
             mCurrLocationMarker.remove();
@@ -248,75 +242,27 @@ public class Trip_driv extends FragmentActivity implements OnMapReadyCallback, G
             // You can add here other case statements according to your requirement.
         }
     }
-	
-	private void redrawLine(){
 
-    mMap.clear();  //clears all Markers and Polylines
+    private void redrawLine(){
 
-    PolylineOptions options = new PolylineOptions().width(5).color(Color.BLUE).geodesic(true);
-    for (int i = 0; i < points.size(); i++) {
-        LatLng point = points.get(i);
-        options.add(point);
+        mMap.clear();  //clears all Markers and Polylines
+
+        PolylineOptions options = new PolylineOptions().width(5).color(Color.BLUE).geodesic(true);
+        for (int i = 0; i < points.size(); i++) {
+            LatLng point = points.get(i);
+            options.add(point);
+        }
+
+        line = mMap.addPolyline(options); //add Polyline
     }
-
-		line = mMap.addPolyline(options); //add Polyline
-	}
 
     public void onSubmit(View view) {
-        RequestQueue MyRequestQueue = Volley.newRequestQueue(getBaseContext());
-        String url = "http://192.168.1.8:8000/endjourney";
-        StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Context context = getApplicationContext();
-                Toast.makeText(context, R.string.fail, LENGTH_LONG)
-                        .show();
-                error.printStackTrace();
-            }
-        }){
-            @Override
-            protected Map<String,String> getParams(){
-                Map<String,String> params = new HashMap<String, String>();
-                params.put("id",value);
-                return params;
-            }
-        };
-        MyRequestQueue.add(MyStringRequest);
+        Intent i = new Intent(Trip_driv.this, payment_driv.class);
+        i.putExtra("startTime", startTime);
+        i.putExtra("distance", distanceTillNow);
+        startActivity(i);
 
     }
 
-    public void onPaym(View view) {
-		
-		RequestQueue MyRequestQueue = Volley.newRequestQueue(getBaseContext());
-        String url = "http://192.168.1.8:8000/driver_complete";
-        StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                Intent i = new Intent(Trip_driv.this, payment_driv.class);
-				startActivity(i);
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Context context = getApplicationContext();
-                Toast.makeText(context, R.string.fail, LENGTH_LONG)
-                        .show();
-                error.printStackTrace();
-            }
-        }){
-            @Override
-            protected Map<String,String> getParams(){
-                Map<String,String> params = new HashMap<String, String>();
-                params.put("id",value);
-                return params;
-            }
-        };
-        MyRequestQueue.add(MyStringRequest);
-        
-    }
+
 }

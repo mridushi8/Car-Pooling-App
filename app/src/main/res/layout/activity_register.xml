@@ -134,7 +134,7 @@
                 android:text="submit"
                 android:textColor="#fff"
                 android:textSize="13dp"
-                android:background="#13b586"/>
+                android:background="@drawable/round" />
 
 
 
