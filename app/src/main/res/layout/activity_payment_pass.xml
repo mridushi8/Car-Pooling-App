@@ -50,7 +50,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/ratingBar"
-        android:isIndicator="true"
         android:numStars="5"
         android:layout_gravity= "center_horizontal"
         android:layout_marginTop="47dp"
@@ -75,7 +74,7 @@
         android:id="@+id/button"
         android:background="@drawable/round"
         android:layout_gravity= "center_horizontal"
-        android:layout_marginTop="28dp"
+        android:layout_marginTop="15dp"
         android:layout_below="@+id/ratingBar"
-        android:layout_alignEnd="@+id/end" />
+        android:layout_centerHorizontal="true" />
 </RelativeLayout>
