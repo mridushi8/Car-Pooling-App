@@ -54,7 +54,7 @@ public class MainActivity3 extends AppCompatActivity {
     public void getStatus() {
         //loading = ProgressDialog.show(this, "Fetching Driver Details", "Please wait..", false, false);
         RequestQueue rq = Volley.newRequestQueue(getBaseContext());
-        String url = "http://192.168.137.103:8000/player_id";
+        String url = Constants.url + "player_id";
         StringRequest sr = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
 
             @Override

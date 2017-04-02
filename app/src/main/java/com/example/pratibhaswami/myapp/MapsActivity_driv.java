@@ -1,8 +1,5 @@
 package com.example.pratibhaswami.myapp;
 
-/**
- * Created by pratibhaswami on 25/03/17.
- */
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -315,7 +312,7 @@ public class MapsActivity_driv extends FragmentActivity implements OnMapReadyCal
 
     public void sendDetails(){
         RequestQueue MyRequestQueue = Volley.newRequestQueue(getBaseContext());
-        String url = "http://192.168.137.103:8000/driver_request";
+        String url = Constants.url + "driver_request";
         StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {

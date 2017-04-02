@@ -1,10 +1,6 @@
 
 package com.example.pratibhaswami.myapp;
 
-/**
- * Created by pratibhaswami on 10/03/17.
- */
-
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -13,6 +9,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -41,9 +38,6 @@ public class MainActivity extends AppCompatActivity {
     public static final String Userid = "idKey";
     SharedPreferences sharedpreferences;
     public ServerUrl serv;
-
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
                                                 newpass = UUID.randomUUID().toString().replaceAll("-", "").substring(0,10);
                                                 System.out.println(newpass);
                                                 RequestQueue MyRequestQueue = Volley.newRequestQueue(getBaseContext());
-                                                String url= "http://192.168.137.103:8000/forgetpass";
+                                                String url= Constants.url + "forgetpass";
                                                 StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>(){
                                                     @Override
                                                     public void onResponse(String response) {
@@ -175,7 +169,8 @@ public class MainActivity extends AppCompatActivity {
                     Pass = pass.getText().toString();
 
                     RequestQueue MyRequestQueue = Volley.newRequestQueue(getBaseContext());
-                    String url= "http://192.168.137.103:8000/checkmatch";
+                    String url= Constants.url + "checkmatch";
+                    Log.d("url", url);
                     StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>(){
                         @Override
                         public void onResponse(String response) {

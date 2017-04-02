@@ -1,7 +1,9 @@
 package com.example.pratibhaswami.myapp;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -11,6 +13,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.Settings;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
@@ -42,6 +45,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+
+import static android.widget.Toast.LENGTH_LONG;
 
 /**
  * Created by ARATI on 2/11/2017.
@@ -81,6 +86,7 @@ public class Trip extends FragmentActivity implements OnMapReadyCallback, Google
         mapFragment.getMapAsync(this);
         sharedpreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
         value = sharedpreferences.getString(Userid, "");
+        gpsenable();
 
         //if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
         //  checkLocationPermission();
@@ -90,11 +96,34 @@ public class Trip extends FragmentActivity implements OnMapReadyCallback, Google
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
 
     }
+    @Override
+    public void onBackPressed() { }
+
+    public void gpsenable(){
+        String something = Settings.Secure.getString(getContentResolver(),Settings.Secure.LOCATION_PROVIDERS_ALLOWED);
+        if(!something.contains("gps")){
+            Context context = getApplicationContext();
+            //Toast.makeText(context,"Enabling GPS", LENGTH_LONG)
+            //        .show();
+            AlertDialog.Builder alertDialogBuilder=  new AlertDialog.Builder(this);
+            alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener(){
+
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+
+                }
+            });
+            alertDialogBuilder.setTitle("Permission");
+            alertDialogBuilder.setMessage("Please enable GPS");
+            alertDialogBuilder.show();
+        }
+
+    }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+        //mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
         //Initialize Google Play Services
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
@@ -299,7 +328,7 @@ public class Trip extends FragmentActivity implements OnMapReadyCallback, Google
     /** public void getStatus(){
      loading = ProgressDialog.show(this, "Redirecting", "Please wait..", false, false);
      RequestQueue rq = Volley.newRequestQueue(getBaseContext());
-     String url = "http://192.168.137.103:8000/status";
+     String url = Constants.url + "status";
      StringRequest sr = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
@@ -347,6 +376,7 @@ public class Trip extends FragmentActivity implements OnMapReadyCallback, Google
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client.connect();
+
         AppIndex.AppIndexApi.start(client, getIndexApiAction());
     }
 
@@ -357,7 +387,7 @@ public class Trip extends FragmentActivity implements OnMapReadyCallback, Google
 
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
-       // AppIndex.AppIndexApi.end(client, getIndexApiAction());
+       AppIndex.AppIndexApi.end(client, getIndexApiAction());
         client.disconnect();
     }
 }

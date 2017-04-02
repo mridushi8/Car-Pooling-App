@@ -6,20 +6,23 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.RatingBar;
 import android.widget.TextView;
+
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,8 +44,11 @@ public class payment_driv extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_payment_driv);
         Intent intent = getIntent();
-        distance=intent.getStringExtra("distance");
-        startTime=intent.getStringExtra("startTime");
+        Bundle bundle = intent.getExtras();
+        distance = bundle.getString("distance");
+        startTime = bundle.getString("startTime");
+        Log.d("distance", distance);
+        Log.d("startTime", startTime);
         actual_fare1=(TextView)findViewById(R.id.textView2);
         sharedpreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
         rating_b = (RatingBar) findViewById(R.id.ratingBar);
@@ -58,7 +64,7 @@ public class payment_driv extends AppCompatActivity {
                 if (buttonView.isChecked()) {
 
                     RequestQueue rq = Volley.newRequestQueue(getBaseContext());
-                    String url = "http://192.168.137.103:8000/paid";
+                    String url = Constants.url + "paid";
                     StringRequest sr = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
 
                         @Override
@@ -97,7 +103,7 @@ public class payment_driv extends AppCompatActivity {
                     public void onClick(View v) {
                         RequestQueue queue = Volley.newRequestQueue(getBaseContext());
                         String value = sharedpreferences.getString(Userid, "");
-                        String url ="http://192.168.137.103:8000/request/?rating=" + String.valueOf(rating_b.getRating()) + "&userid=" + value;
+                        String url ="http://172.16.32.224:8000/request/?rating=" + String.valueOf(rating_b.getRating()) + "&userid=" + value;
 
                         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                                 new Response.Listener<String>() {
@@ -123,7 +129,7 @@ public class payment_driv extends AppCompatActivity {
 
     public void getStatus() {
         RequestQueue rq = Volley.newRequestQueue(getBaseContext());
-        String url = "http://192.168.137.103:8000/actualfare";
+        String url = Constants.url + "actualfare";
         StringRequest sr = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
 
             @Override
@@ -152,9 +158,6 @@ public class payment_driv extends AppCompatActivity {
     }
 
     private void showJSON(String json) throws JSONException {
-
-        JSONObject reader = new JSONObject(json);
-        actual_fare = reader.getString("actual_fare");
-        actual_fare1.setText(actual_fare);
+        actual_fare1.setText(String.valueOf(json));
     }
 }

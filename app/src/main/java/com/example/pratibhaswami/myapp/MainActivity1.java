@@ -107,7 +107,7 @@ public class MainActivity1 extends AppCompatActivity {
     public void getStatus() {
       //  loading = ProgressDialog.show(this, "Fetching Driver Details", "Please wait..", false, false);
         RequestQueue rq = Volley.newRequestQueue(getBaseContext());
-        String url = "http://192.168.137.103:8000/get_passenger";
+        String url = Constants.url + "get_passenger";
         StringRequest sr = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
 
             @Override
@@ -161,7 +161,7 @@ public class MainActivity1 extends AppCompatActivity {
     public void getStatus1() {
         loading = ProgressDialog.show(this, "Fetching Driver Details", "Please wait..", false, false);
         RequestQueue rq = Volley.newRequestQueue(getBaseContext());
-        String url = "http://192.168.137.103:8000/driver_response";
+        String url = Constants.url + "driver_response";
         StringRequest sr = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
 
             @Override

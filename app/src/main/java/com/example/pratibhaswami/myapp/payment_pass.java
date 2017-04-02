@@ -6,18 +6,23 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RatingBar;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.util.HashMap;
 import java.util.Map;
 public class payment_pass extends AppCompatActivity {
@@ -41,13 +46,25 @@ public class payment_pass extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_payment_pass);
-        Intent intent = getIntent();
-        distance=intent.getStringExtra("distance");
-        startTime=intent.getStringExtra("startTime");
+
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setTitle("LIFT");
+        }
+
+        //Intent intent = getIntent();
+        //distance=intent.getExtras().getString("distance");
+        //startTime=intent.getExtras().getString("startTime");
         actual_fare1=(TextView)findViewById(R.id.textView);
         button_rate  = (Button) findViewById(R.id.button);
         rating_b  = (RatingBar) findViewById(R.id.ratingBar);
         end=(Button)findViewById(R.id.end);
+
+        rating_b.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
+            @Override
+            public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
+                Toast.makeText(getApplicationContext(), "You have rated : " + String.valueOf(rating ), Toast.LENGTH_LONG).show();
+            }
+        });
 
         sharedpreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
         value = sharedpreferences.getString(Userid, "");
@@ -58,7 +75,7 @@ public class payment_pass extends AppCompatActivity {
             public void onClick(View view) {
 
                 RequestQueue rq = Volley.newRequestQueue(getBaseContext());
-                String url = "http://192.168.137.103:8000/paid";
+                String url = Constants.url + "paid";
                 StringRequest sr = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
 
                     @Override
@@ -100,11 +117,12 @@ public class payment_pass extends AppCompatActivity {
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        getStatus();
                         RequestQueue queue = Volley.newRequestQueue(getBaseContext());
                         final String value = sharedpreferences.getString(Userid, "");
-                        String url ="http://192.168.137.103:8000/rating=";
+                        String url =Constants.url + "rating";
 
-                        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
                                 new Response.Listener<String>() {
                                     @Override
                                     public void onResponse(String response) {
@@ -135,8 +153,10 @@ public class payment_pass extends AppCompatActivity {
     }
 
     public void getStatus() {
+        return;
+        /*
         RequestQueue rq = Volley.newRequestQueue(getBaseContext());
-        String url = "http://192.168.137.103:8000/actualfare";
+        String url = Constants.url + "actualfare";
         StringRequest sr = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
 
             @Override
@@ -156,12 +176,14 @@ public class payment_pass extends AppCompatActivity {
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<String, String>();
+                Log.d("distance", String.valueOf(distance));
+                Log.d("startTime", startTime);
                 params.put("distance",distance );
                 params.put("startTime",startTime );
                 return params;
             }
         };
-        rq.add(sr);
+        rq.add(sr); */
     }
 
     private void showJSON(String json) throws JSONException {

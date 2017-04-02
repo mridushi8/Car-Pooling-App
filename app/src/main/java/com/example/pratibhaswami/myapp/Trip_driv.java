@@ -1,16 +1,20 @@
 package com.example.pratibhaswami.myapp;
 
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
@@ -40,6 +44,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
+import static android.widget.Toast.LENGTH_LONG;
+
 /**
  * Created by ARATI on 2/11/2017.
  */
@@ -65,7 +71,7 @@ public class Trip_driv extends FragmentActivity implements OnMapReadyCallback, G
 
     Handler handler;
     ProgressDialog loading;
-    String timeStamp = new SimpleDateFormat("MMM dd yyyy HH:mm").format(Calendar.getInstance().getTime()).toString();
+    String timeStamp = new SimpleDateFormat("MMM dd yyyy hh:mm").format(Calendar.getInstance().getTime()).toString();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,14 +87,39 @@ public class Trip_driv extends FragmentActivity implements OnMapReadyCallback, G
         mapFragment.getMapAsync(this);
         sharedpreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
         value = sharedpreferences.getString(Userid, "");
+        gpsenable();
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
+
+    }
+
+    @Override
+    public void onBackPressed() { }
+
+    public void gpsenable(){
+        String something = Settings.Secure.getString(getContentResolver(),Settings.Secure.LOCATION_PROVIDERS_ALLOWED);
+        if(!something.contains("gps")){
+            Context context = getApplicationContext();
+            //Toast.makeText(context,"Enabling GPS", LENGTH_LONG)
+            //        .show();
+            AlertDialog.Builder alertDialogBuilder=  new AlertDialog.Builder(this);
+            alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener(){
+
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+
+                }
+            });
+            alertDialogBuilder.setTitle("Permission");
+            alertDialogBuilder.setMessage("Please enable GPS");
+            alertDialogBuilder.show();
+        }
 
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+        //mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
 
         //Initialize Google Play Services
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -257,9 +288,11 @@ public class Trip_driv extends FragmentActivity implements OnMapReadyCallback, G
     }
 
     public void onSubmit(View view) {
+        startTime = new Date();
         Intent i = new Intent(Trip_driv.this, payment_driv.class);
-        i.putExtra("startTime", startTime);
-        i.putExtra("distance", distanceTillNow);
+        i.putExtra("startTime", timeStamp);
+        i.putExtra("distance", String.valueOf(distanceTillNow));
+        i.putExtra("id", value);
         startActivity(i);
 
     }

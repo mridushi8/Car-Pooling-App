@@ -84,9 +84,13 @@ public class Details extends AppCompatActivity {
 		});
 		sharedpreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
 		value = sharedpreferences.getString(Userid, "");
+		loading = ProgressDialog.show(this, "Fetching Driver Details", "Please wait..", false, false);
 		getStatus();
         client2 = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
 	}
+
+	@Override
+	public void onBackPressed() { }
 
 	
 
@@ -95,7 +99,7 @@ public class Details extends AppCompatActivity {
 public void getStatus() {
 	//loading = ProgressDialog.show(this, "Fetching Driver Details", "Please wait..", false, false);
 	RequestQueue rq = Volley.newRequestQueue(getBaseContext());
-	String url = "http://192.168.137.103:8000/status";
+	String url = Constants.url + "status";
 	StringRequest sr = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() { 
 			@RequiresApi(api = Build.VERSION_CODES.KITKAT)
 			@Override
@@ -122,7 +126,7 @@ public void getStatus() {
 	public void getStatus1() {
 		//loading = ProgressDialog.show(this, "Fetching Driver Details", "Please wait..", false, false);
 		RequestQueue rq = Volley.newRequestQueue(getBaseContext());
-		String url = "http://192.168.137.103:8000/accept_driver";
+		String url = Constants.url + "accept_driver";
 		StringRequest sr = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
 			@RequiresApi(api = Build.VERSION_CODES.KITKAT)
 			@Override
@@ -197,7 +201,7 @@ public void onStop() {
 
 public void cancelTrip(View view){
 	RequestQueue rq = Volley.newRequestQueue(getBaseContext());
-        String url = "http://192.168.137.103:8000/complete";
+        String url = Constants.url + "complete";
         StringRequest sr = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -223,13 +227,14 @@ public void cancelTrip(View view){
 
 	public void getDriver(){
 		RequestQueue rq = Volley.newRequestQueue(getBaseContext());
-		String url = "http://192.168.137.103:8000/get_driver";
+		String url = Constants.url + "get_driver";
 		StringRequest sr = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
 			@Override
 			public void onResponse(String response) {
 				try{
 					JSONObject reader = new JSONObject(response);
-				name = reader.getString("name");
+					loading.dismiss();
+					name = reader.getString("name");
 					phone = reader.getString("phone");
 					carno = reader.getString("carno");
 

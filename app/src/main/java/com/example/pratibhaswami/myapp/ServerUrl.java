@@ -13,7 +13,7 @@ public class ServerUrl {
         urlString.append(app);
         return urlString.toString();**/
         String url="";
-        url="http://172.16.32.224:8000/"+app;
+        url=Constants.url + ""+app;
         Log.d("url",url);
         return url;
     }
